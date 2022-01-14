@@ -5,16 +5,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class HomeController {
+public class LoginController {
 
-    @GetMapping("/")
-    public String index(Model model) {
+    @GetMapping("/login")
+    public String login(Model model) {
         return "index";
     }
 
-    @GetMapping("/team")
-    public String team(Model model) {
-        return "team";
+    @GetMapping("/logout")
+    public String logout(Model model) {
+        return "index";
     }
 
 }
