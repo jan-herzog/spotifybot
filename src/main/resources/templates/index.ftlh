@@ -36,8 +36,8 @@
         target="_blank">Kexesser</a></span></footer>
 <div class="example-box" style="height: 100vh;"><h1><strong>SPITCHBOT</strong></h1>
     <p>Twitch Spotify Connection</p>
-    <button class="btn btn-link border-pretty" type="button" data-bs-target="/dashboard">Dashboard&nbsp;<i
-            class="icon ion-android-arrow-forward"></i></button>
+    <a class="btn btn-link border-pretty" role="button" href="/dashboard">Dashboard&nbsp;<i
+            class="icon ion-android-arrow-forward"></i></a>
     <div style="width: 350px;background-image: linear-gradient(to bottom right, #2d2d2d, #151515);padding: 20px;margin: 20px;border-radius: 20px;box-shadow: 6px 6px 10px 0px #1f1f1f;">
         <div><span>Note that this project is still in development and no functionality can be guaranteed.</span></div>
         <div style="padding-top: 5px;"><span>Check out the project on&nbsp;<a
