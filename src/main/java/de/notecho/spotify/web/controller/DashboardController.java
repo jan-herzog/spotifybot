@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class DashboardController {
 
     @GetMapping("/dashboard")
-    public String dashbaord(Model model) {
-        return "index";
+    public String dashboard(Model model) {
+        return "dashboard";
     }
 
 }
