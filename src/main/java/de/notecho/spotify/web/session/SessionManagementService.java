@@ -1,4 +1,4 @@
-package de.notecho.spotify.bot.session;
+package de.notecho.spotify.web.session;
 
 import org.springframework.stereotype.Service;
 
