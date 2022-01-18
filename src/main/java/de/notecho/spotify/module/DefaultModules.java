@@ -1,8 +1,11 @@
 package de.notecho.spotify.module;
 
+import de.notecho.spotify.database.user.entities.module.Module;
+import de.notecho.spotify.database.user.entities.module.ModuleEntry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -87,5 +90,11 @@ public enum DefaultModules {
 
     private final List<DefaultEntry> entries;
 
+    public Module createNewInstance() {
+        final List<ModuleEntry> entries = new ArrayList<>();
+        for (DefaultEntry entry : this.entries)
+            entries.add(new ModuleEntry(0L, entry.getKey(), entry.getValue(), entry.getUserLevel()));
+        return new Module(0L, entries, this.commandType);
+    }
 
 }
