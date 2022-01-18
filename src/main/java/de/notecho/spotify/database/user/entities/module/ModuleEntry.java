@@ -1,5 +1,6 @@
 package de.notecho.spotify.database.user.entities.module;
 
+import de.notecho.spotify.module.UserLevel;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModuleEntry {
