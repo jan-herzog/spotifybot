@@ -1,4 +1,4 @@
-package de.notecho.spotify.database.user.entities.module;
+package de.notecho.spotify.module;
 
 import com.github.twitch4j.common.enums.CommandPermission;
 import lombok.AllArgsConstructor;
