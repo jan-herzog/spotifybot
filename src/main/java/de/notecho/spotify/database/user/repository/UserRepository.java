@@ -1,11 +1,11 @@
 package de.notecho.spotify.database.user.repository;
 
-import de.notecho.spotify.database.user.entities.User;
+import de.notecho.spotify.database.user.entities.BotUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<BotUser, Long> {
 
-    User findByTwitchId(String twitchId);
+    BotUser findByTwitchId(String twitchId);
 
     boolean existsByTwitchId(String twitchId);
 

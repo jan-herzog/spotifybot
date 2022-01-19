@@ -4,6 +4,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.helix.domain.User;
+import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.repository.UserRepository;
 import de.notecho.spotify.module.DefaultModules;
 import de.notecho.spotify.web.session.SessionManagementService;
@@ -48,9 +49,9 @@ public class CallbackController {
         if (users.size() == 0)
             return "redirect:/erorr?code=503";
         User twitchUser = users.get(0);
-        de.notecho.spotify.database.user.entities.User user = repository.findByTwitchId(twitchUser.getId());
+        BotUser user = repository.findByTwitchId(twitchUser.getId());
         if (user == null) {
-            user = new de.notecho.spotify.database.user.entities.User(0L, twitchUser.getId(), DefaultModules.defaultList());
+            user = new BotUser(0L, twitchUser.getId(), DefaultModules.defaultList());
             repository.saveAndFlush(user);
         }
         sessionManagementService.createSession(user);
