@@ -5,7 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    long countAllByIdEqualsAndTestAsdEquals(long id, String sad);
+    User findByTwitchId(String twitchId);
+
+    boolean existsByTwitchId(String twitchId);
+
 
 
 }

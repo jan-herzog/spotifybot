@@ -1,18 +1,12 @@
 package de.notecho.spotify.web.controller;
 
-import de.notecho.spotify.web.session.SessionManagementService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class LoginController {
-
-    private final SessionManagementService sessionManagementService;
 
     @GetMapping("/login")
     public String login(@CookieValue(name = "session", defaultValue = "null") String session, Model model) {

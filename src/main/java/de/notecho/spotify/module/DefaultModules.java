@@ -97,4 +97,11 @@ public enum DefaultModules {
         return new Module(0L, entries, this.commandType);
     }
 
+    public static List<Module> defaultList() {
+        List<Module> list = new ArrayList<>();
+        for (DefaultModules value : values())
+            list.add(value.createNewInstance());
+        return list;
+    }
+
 }
