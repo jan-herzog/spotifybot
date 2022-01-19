@@ -27,9 +27,12 @@ public class SessionManagementService {
         return sessions.getIfPresent(user) != null;
     }
 
-    public void createSession(BotUser user) {
-        if(!hasSession(user))
+    public String createSession(BotUser user) {
+        if(!hasSession(user)) {
             sessions.put(user, UUID.randomUUID().toString());
+            return sessions.getIfPresent(user);
+        }
+        return null;
     }
 
 }

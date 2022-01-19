@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -54,7 +55,8 @@ public class CallbackController {
             user = new BotUser(0L, twitchUser.getId(), DefaultModules.defaultList());
             repository.saveAndFlush(user);
         }
-        sessionManagementService.createSession(user);
+        Cookie cookie = new Cookie("session", sessionManagementService.createSession(user));
+        cookie.setMaxAge(3600);
         return "redirect:/dashboard";
     }
 
