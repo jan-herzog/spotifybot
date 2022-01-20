@@ -11,11 +11,15 @@ import de.notecho.spotify.module.DefaultModules;
 import de.notecho.spotify.module.TokenType;
 import de.notecho.spotify.web.session.SessionManagementService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -30,13 +34,28 @@ public class CallbackController {
 
     private final TwitchClient twitchClient;
 
+    private final SpotifyApi spotifyApi;
+
     private final OAuth2IdentityProvider oAuth2IdentityProvider;
 
     private final UserRepository repository;
 
+    @SneakyThrows
     @GetMapping("/spotify/callback")
-    public String spotifyCallback(Model model) {
-        return "index";
+    public String spotifyCallback(@RequestParam(name = "code", defaultValue = "null") String code, @CookieValue(name = "session", defaultValue = "null") String session, Model model) {
+        if (code.equals("null"))
+            return "redirect:/erorr?code=503";
+        if (sessionManagementService.getUser(session) == null)
+            return "redirect:/erorr?code=503";
+        BotUser user = sessionManagementService.getUser(session);
+        AuthorizationCodeCredentials codeCredentials = spotifyApi.authorizationCode(code).build().execute();
+        if (user.spotifyTokens() != null) {
+            user.spotifyTokens().setAccessToken(codeCredentials.getAccessToken());
+            user.spotifyTokens().setRefreshToken(codeCredentials.getRefreshToken());
+        } else
+            user.getTokenPairs().add(new TokenPair(0L, codeCredentials.getAccessToken(), codeCredentials.getRefreshToken(), TokenType.SPOTIFY));
+        repository.saveAndFlush(user);
+        return "redirect:/dashboard";
     }
 
     @GetMapping("/spotify/unlink")
