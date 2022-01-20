@@ -1,6 +1,6 @@
 package de.notecho.spotify.database.user.entities.module;
 
-import de.notecho.spotify.module.CommandType;
+import de.notecho.spotify.module.ModuleType;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -24,7 +24,7 @@ public class Module {
     @OneToMany
     private List<ModuleEntry> entries;
 
-    private CommandType commandType;
+    private ModuleType moduleType;
 
 
 

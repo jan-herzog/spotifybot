@@ -9,27 +9,30 @@ import java.util.Set;
 @AllArgsConstructor
 public enum UserLevel {
 
-    DEFAULT("Viewer"),
-    VIP("Vip"),
-    MOD("Moderator"),
-    BROADCASTER("Broadcaster"),
-    UNDEFINED("undefined");
+    DEFAULT("Viewer", 0),
+    VIP("Vip", 1),
+    MOD("Moderator", 2),
+    BROADCASTER("Broadcaster", 3);
+
 
     @Getter
     private final String prettyName;
 
-    public boolean isHigherOrEquals(Set<CommandPermission> permissions) {
-        if (this.equals(UserLevel.UNDEFINED))
-            return true;
-        if (permissions.contains(CommandPermission.BROADCASTER))
-            return true;
-        if (this.equals(UserLevel.VIP))
-            return permissions.contains(CommandPermission.VIP);
-        if (this.equals(UserLevel.MOD))
-            return permissions.contains(CommandPermission.MODERATOR);
-        if (this.equals(UserLevel.BROADCASTER))
-            return false;
-        return true;
+    @Getter
+    private final int power;
+
+    public static UserLevel get(Set<CommandPermission> permissions) {
+        if(permissions.contains(CommandPermission.BROADCASTER))
+            return BROADCASTER;
+        if(permissions.contains(CommandPermission.MODERATOR))
+            return MOD;
+        if(permissions.contains(CommandPermission.VIP))
+            return VIP;
+        return DEFAULT;
+    }
+
+    public boolean isHigherOrEquals(UserLevel userLevel) {
+        return this.power >= userLevel.power;
     }
 
 }

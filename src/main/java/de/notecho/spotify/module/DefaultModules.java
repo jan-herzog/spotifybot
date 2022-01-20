@@ -15,57 +15,57 @@ import java.util.List;
 public enum DefaultModules {
 
     SONG(
-            CommandType.SONG,
+            ModuleType.SONG,
             Arrays.asList(
                     new DefaultEntry("playingSong", "$USER, Current song playing: $SONG - $ARTISTS", UserLevel.DEFAULT),
                     new DefaultEntry("notPlaying", "$USER, Spotify Playback is currently paused!", UserLevel.DEFAULT)
             )
     ),
     LASTSONG(
-            CommandType.SONG,
+            ModuleType.LASTSONG,
             Collections.singletonList(
                     new DefaultEntry("lastSong", "$USER, Last song played: $LASTSONG - $ARTISTS", UserLevel.DEFAULT)
             )
     ),
     VOLUME(
-            CommandType.SONG,
+            ModuleType.VOLUME,
             Arrays.asList(
                     new DefaultEntry("showVolume", "$USER, The current Spotify Volume is at $VOLUME.", UserLevel.MOD),
                     new DefaultEntry("setVolume", "$USER, The Spotify Volume is now set to $VOLUME", UserLevel.MOD)
             )
     ),
     PAUSE(
-            CommandType.SONG,
+            ModuleType.PAUSE,
             Collections.singletonList(
                     new DefaultEntry("sPause", "$USER, Playback is paused now!", UserLevel.MOD)
             )
     ),
-    SPLAY(
-            CommandType.SONG,
+    PLAY(
+            ModuleType.PLAY,
             Collections.singletonList(
                     new DefaultEntry("sPlay", "$USER, '$SONG - $ARTISTS' is playing now!", UserLevel.MOD)
             )
     ),
     PLAYADD(
-            CommandType.SONG,
+            ModuleType.PLAYADD,
             Collections.singletonList(
                     new DefaultEntry("sPlayAdd", "$USER, '$SONG' was added to the Spotify Queue!", UserLevel.MOD)
             )
     ),
     SKIP(
-            CommandType.SONG,
+            ModuleType.SKIP,
             Collections.singletonList(
                     new DefaultEntry("sSkip", "$USER, '$SONG' was skipped!", UserLevel.MOD)
             )
     ),
     PREVIOUS(
-            CommandType.SONG,
+            ModuleType.PREVIOUS,
             Collections.singletonList(
                     new DefaultEntry("sPrevious", "$USER, '$SONG' is playing now!", UserLevel.MOD)
             )
     ),
-    REQUESTSONG(
-            null,
+    SONGREQUEST(
+            ModuleType.SONGREQUEST,
             Arrays.asList(
                     new DefaultEntry("srRedeem", "Songrequest", UserLevel.DEFAULT),
                     new DefaultEntry("requested", "$USER, The Song '$SONG' was requested.", UserLevel.DEFAULT),
@@ -75,7 +75,7 @@ public enum DefaultModules {
             )
     ),
     SYSTEM(
-            null,
+            ModuleType.SYSTEM,
             Arrays.asList(
                     new DefaultEntry("notAvailable", "$USER, The Song '$SONG' is not available.", UserLevel.DEFAULT),
                     new DefaultEntry("notFound", "$USER, No matching song was found for this specific search query.", UserLevel.DEFAULT),
@@ -86,7 +86,7 @@ public enum DefaultModules {
             )
     );
 
-    private final CommandType commandType;
+    private final ModuleType commandType;
 
     private final List<DefaultEntry> entries;
 

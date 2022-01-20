@@ -34,4 +34,8 @@ public class BotUser {
         return tokenPairs.stream().filter(tokenPair -> tokenPair.getTokenType().equals(TokenType.SPOTIFY)).findAny().orElse(null);
     }
 
+    public TokenPair chatAccountTokens() {
+        return tokenPairs.stream().filter(tokenPair -> tokenPair.getTokenType().equals(TokenType.CHATACCOUNT)).findAny().orElse(null);
+    }
+
 }

@@ -6,22 +6,22 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum CommandType {
+public enum ModuleType {
 
     SONG("song", null),
     LASTSONG("lastsong", null),
-    SVOLUME("svolume", null),
-    SPAUSE("spause", null),
-    SPLAY("splay", null),
-    SPLAYADD("splayadd", null),
-    SSKIP("sskip", null),
-    SPREVIOUS("sprevious", null),
-    ;
+    VOLUME("svolume", null),
+    PAUSE("spause", null),
+    PLAY("splay", null),
+    PLAYADD("splayadd", null),
+    SKIP("sskip", null),
+    PREVIOUS("sprevious", null),
+    SONGREQUEST(null, null),
+    SYSTEM(null, null);
 
     private final String trigger;
 
     private final Class<?> commandClass;
-
 
 
 }
