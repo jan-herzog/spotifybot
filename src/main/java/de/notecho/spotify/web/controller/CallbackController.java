@@ -5,8 +5,10 @@ import com.github.philippheuer.credentialmanager.identityprovider.OAuth2Identity
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.helix.domain.User;
 import de.notecho.spotify.database.user.entities.BotUser;
+import de.notecho.spotify.database.user.entities.TokenPair;
 import de.notecho.spotify.database.user.repository.UserRepository;
 import de.notecho.spotify.module.DefaultModules;
+import de.notecho.spotify.module.TokenType;
 import de.notecho.spotify.web.session.SessionManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -52,9 +55,12 @@ public class CallbackController {
         User twitchUser = users.get(0);
         BotUser user = repository.findByTwitchId(twitchUser.getId());
         if (user == null) {
-            user = new BotUser(0L, twitchUser.getId(), DefaultModules.defaultList());
-            repository.saveAndFlush(user);
+            user = new BotUser(0L, twitchUser.getId(), DefaultModules.defaultList(), Collections.singletonList(new TokenPair(0L, credentialByCode.getAccessToken(), credentialByCode.getRefreshToken(), TokenType.TWITCH)));
+        } else {
+            user.twitchTokens().setAccessToken(credentialByCode.getAccessToken());
+            user.twitchTokens().setRefreshToken(credentialByCode.getRefreshToken());
         }
+        repository.saveAndFlush(user);
         Cookie cookie = new Cookie("session", sessionManagementService.createSession(user));
         cookie.setMaxAge(3600);
         return "redirect:/dashboard";
