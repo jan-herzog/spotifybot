@@ -26,6 +26,12 @@ public class BotConfiguration {
     @Value("${twitch.token}")
     private String twitchToken;
 
+    @Value("${spotify.clientId}")
+    private String spotifyClientId;
+
+    @Value("${spotify.clientSecret}")
+    private String spotifyClientSecret;
+
     @Bean
     public CredentialManager buildCredentialManager() {
         return CredentialManagerBuilder.builder().build();
@@ -55,8 +61,8 @@ public class BotConfiguration {
     @Bean
     public SpotifyApi buildSpotifyApi() {
         return new SpotifyApi.Builder()
-                .setClientId("551e70c923a6485889ff1c8f0576571b")
-                .setClientSecret("66fe49916ba94a58b6b695234ded6eb3")
+                .setClientId(spotifyClientId)
+                .setClientSecret(spotifyClientSecret)
                 .setRedirectUri(SpotifyHttpManager.makeUri("https://spitchbot.com/spotify/callback"))
                 .build();
     }
