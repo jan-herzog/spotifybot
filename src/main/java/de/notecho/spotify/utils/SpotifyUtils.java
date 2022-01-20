@@ -2,8 +2,6 @@ package de.notecho.spotify.utils;
 
 
 import com.google.gson.JsonParser;
-import com.wrapper.spotify.model_objects.specification.ArtistSimplified;
-import com.wrapper.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 
