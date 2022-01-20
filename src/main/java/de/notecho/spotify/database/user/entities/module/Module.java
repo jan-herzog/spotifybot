@@ -26,6 +26,8 @@ public class Module {
 
     private ModuleType moduleType;
 
-
+    public ModuleEntry getEntry(String key) {
+        return entries.stream().filter(entry -> entry.getKey().equals(key)).findAny().orElse(null);
+    }
 
 }

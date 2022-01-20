@@ -40,7 +40,7 @@ public class BotInstance {
                 .setClientSecret(environment.getProperty("spotify.clientSecret"))
                 .setRedirectUri(SpotifyHttpManager.makeUri("https://spitchbot.com/spotify/callback"))
                 .build();
-        if(user.chatAccountTokens() == null)
+        if (user.chatAccountTokens() == null)
             this.client = context.getBean(TwitchClient.class);
         else
             this.client = TwitchClientBuilder.builder()
@@ -54,7 +54,7 @@ public class BotInstance {
         this.client.getChat().joinChannel(this.login);
         this.id = twitchUser.getId();
         for (Module module : this.user.getModules()) {
-            this.modules.add((BaseModule) module.getModuleType().getCommandClass().getConstructor(BotInstance.class).newInstance(this));
+            this.modules.add((BaseModule) module.getModuleType().getCommandClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
         }
 
     }
