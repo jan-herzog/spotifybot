@@ -1,5 +1,6 @@
 package de.notecho.spotify.database.user.entities;
 
+import de.notecho.spotify.module.TokenType;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -21,5 +22,7 @@ public class TokenPair {
     private String accessToken;
 
     private String refreshToken;
+
+    private TokenType tokenType;
 
 }
