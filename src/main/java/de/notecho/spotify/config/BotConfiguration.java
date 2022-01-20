@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.SpotifyHttpManager;
 
 @Configuration
 public class BotConfiguration {
@@ -48,6 +50,15 @@ public class BotConfiguration {
     @DependsOn("buildCredentialManager")
     public OAuth2IdentityProvider getOAuth2IdentityProvider(CredentialManager credentialManager) {
         return credentialManager.getOAuth2IdentityProviderByName("twitch").get();
+    }
+
+    @Bean
+    public SpotifyApi buildSpotifyApi() {
+        return new SpotifyApi.Builder()
+                .setClientId("551e70c923a6485889ff1c8f0576571b")
+                .setClientSecret("66fe49916ba94a58b6b695234ded6eb3")
+                .setRedirectUri(SpotifyHttpManager.makeUri("https://spitchbot.com/spotify/callback"))
+                .build();
     }
 
 }
