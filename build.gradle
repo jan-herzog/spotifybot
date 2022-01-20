@@ -19,6 +19,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'se.michaelthelin.spotify:spotify-web-api-java:7.0.0'
 	implementation 'com.github.twitch4j:twitch4j:1.7.0'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
