@@ -1,14 +1,14 @@
 package de.notecho.spotify.module;
 
+import de.notecho.spotify.bot.modules.commands.SongCommand;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
 public enum ModuleType {
 
-    SONG("song", null),
+    SONG("song", SongCommand.class),
     LASTSONG("lastsong", null),
     VOLUME("svolume", null),
     PAUSE("spause", null),
