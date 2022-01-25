@@ -17,6 +17,9 @@ import se.michaelthelin.spotify.SpotifyHttpManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public class BotInstance {
@@ -30,6 +33,8 @@ public class BotInstance {
     private final List<BaseModule> modules = new ArrayList<>();
 
     private final String id, login;
+
+    private long nextCheck = System.currentTimeMillis();
 
     @SneakyThrows
     public BotInstance(BotUser user, Environment environment) {
@@ -58,7 +63,20 @@ public class BotInstance {
                 continue;
             this.modules.add((BaseModule) module.getModuleType().getCommandClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
         }
-
+        updateTokens();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if(nextCheck >= System.currentTimeMillis())
+                    updateTokens();
+            }
+        }, 0, 1000);
     }
+
+    private void updateTokens() {
+
+        nextCheck = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(50);
+    }
+
 
 }
