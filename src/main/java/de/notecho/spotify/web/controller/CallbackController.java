@@ -4,6 +4,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.helix.domain.User;
+import de.notecho.spotify.bot.BotInstanceManagementService;
 import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.entities.TokenPair;
 import de.notecho.spotify.database.user.repository.UserRepository;
@@ -38,6 +39,8 @@ public class CallbackController {
 
     private final OAuth2IdentityProvider oAuth2IdentityProvider;
 
+    private final BotInstanceManagementService botInstanceManagementService;
+
     private final UserRepository repository;
 
     @SneakyThrows
@@ -55,6 +58,7 @@ public class CallbackController {
         } else
             user.getTokenPairs().add(new TokenPair(0L, codeCredentials.getAccessToken(), codeCredentials.getRefreshToken(), TokenType.SPOTIFY));
         repository.saveAndFlush(user);
+        botInstanceManagementService.startInstance(user);
         return "redirect:/dashboard";
     }
 
