@@ -6,6 +6,7 @@ import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.helix.domain.User;
 import de.notecho.spotify.SpotifyBotApplication;
+import de.notecho.spotify.bot.BotInstanceManagementService;
 import de.notecho.spotify.bot.modules.BaseModule;
 import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.entities.module.Module;
@@ -43,6 +44,8 @@ public class BotInstance {
 
     private final OAuth2IdentityProvider oAuth2IdentityProvider;
 
+    private final BotInstanceManagementService botInstanceManagementService;
+
     private long nextCheck = System.currentTimeMillis();
 
     @SneakyThrows
@@ -66,6 +69,7 @@ public class BotInstance {
                     .withChatAccount(new OAuth2Credential("twitch", "oauth:" + user.twitchTokens().getAccessToken()))
                     .build();
         this.oAuth2IdentityProvider = context.getBean(OAuth2IdentityProvider.class);
+        this.botInstanceManagementService = context.getBean(BotInstanceManagementService.class);
         User twitchUser = client.getHelix().getUsers(null, null, null).execute().getUsers().get(0);
         this.login = twitchUser.getLogin();
         this.client.getChat().joinChannel(this.login);
@@ -87,6 +91,10 @@ public class BotInstance {
 
 
     private void updateTokens() {
+        if(user.spotifyTokens() == null) {
+            botInstanceManagementService.stopInstance(user);
+            return;
+        }
         OAuth2Credential credential = new OAuth2Credential("twitch", user.twitchTokens().getAccessToken());
         credential.setRefreshToken(user.twitchTokens().getRefreshToken());
         Optional<OAuth2Credential> credentialOptional = oAuth2IdentityProvider.refreshCredential(credential);
@@ -110,6 +118,7 @@ public class BotInstance {
         } catch (BadRequestException e) {
             user.getTokenPairs().removeIf(tokenPair -> tokenPair.getTokenType().equals(TokenType.SPOTIFY));
             Logger.log(LogType.INFO, login + " revoked his access token so it was removed from the database.", login, "revoked", "database");
+            botInstanceManagementService.stopInstance(user);
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
