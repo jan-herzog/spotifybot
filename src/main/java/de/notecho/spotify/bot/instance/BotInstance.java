@@ -10,6 +10,7 @@ import de.notecho.spotify.bot.BotInstanceManagementService;
 import de.notecho.spotify.bot.modules.BaseModule;
 import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.entities.module.Module;
+import de.notecho.spotify.database.user.repository.UserRepository;
 import de.notecho.spotify.module.TokenType;
 import de.notecho.spotify.utils.logger.LogType;
 import de.notecho.spotify.utils.logger.Logger;
@@ -42,15 +43,13 @@ public class BotInstance {
 
     private String id, login;
 
-    private final OAuth2IdentityProvider oAuth2IdentityProvider;
-
-    private final BotInstanceManagementService botInstanceManagementService;
+    private final ApplicationContext context;
 
     private long nextCheck = System.currentTimeMillis();
 
     @SneakyThrows
     public BotInstance(BotUser user, Environment environment) {
-        ApplicationContext context = SpotifyBotApplication.getInstance();
+        this.context = SpotifyBotApplication.getInstance();
         this.user = user;
         this.spotifyApi = new SpotifyApi.Builder()
                 .setClientId(environment.getProperty("spotify.clientId"))
@@ -68,8 +67,6 @@ public class BotInstance {
                     .withDefaultAuthToken(new OAuth2Credential("twitch", "oauth:" + user.twitchTokens().getAccessToken()))
                     .withChatAccount(new OAuth2Credential("twitch", "oauth:" + user.twitchTokens().getAccessToken()))
                     .build();
-        this.oAuth2IdentityProvider = context.getBean(OAuth2IdentityProvider.class);
-        this.botInstanceManagementService = context.getBean(BotInstanceManagementService.class);
         User twitchUser = client.getHelix().getUsers(null, null, null).execute().getUsers().get(0);
         this.login = twitchUser.getLogin();
         this.client.getChat().joinChannel(this.login);
@@ -91,13 +88,13 @@ public class BotInstance {
 
 
     private void updateTokens() {
-        if(user.spotifyTokens() == null) {
-            botInstanceManagementService.stopInstance(user);
+        if (user.spotifyTokens() == null) {
+            context.getBean(BotInstanceManagementService.class).stopInstance(user);
             return;
         }
         OAuth2Credential credential = new OAuth2Credential("twitch", user.twitchTokens().getAccessToken());
         credential.setRefreshToken(user.twitchTokens().getRefreshToken());
-        Optional<OAuth2Credential> credentialOptional = oAuth2IdentityProvider.refreshCredential(credential);
+        Optional<OAuth2Credential> credentialOptional = context.getBean(OAuth2IdentityProvider.class).refreshCredential(credential);
         if (credentialOptional.isPresent()) {
             credential = credentialOptional.get();
             User twitchUser = client.getHelix().getUsers(credential.getAccessToken(), null, null).execute().getUsers().get(0);
@@ -118,10 +115,11 @@ public class BotInstance {
         } catch (BadRequestException e) {
             user.getTokenPairs().removeIf(tokenPair -> tokenPair.getTokenType().equals(TokenType.SPOTIFY));
             Logger.log(LogType.INFO, login + " revoked his access token so it was removed from the database.", login, "revoked", "database");
-            botInstanceManagementService.stopInstance(user);
+            context.getBean(BotInstanceManagementService.class).stopInstance(user);
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
+        context.getBean(UserRepository.class).saveAndFlush(user);
         nextCheck = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(50);
     }
 
