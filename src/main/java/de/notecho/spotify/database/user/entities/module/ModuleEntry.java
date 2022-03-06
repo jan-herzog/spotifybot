@@ -3,9 +3,7 @@ package de.notecho.spotify.database.user.entities.module;
 import de.notecho.spotify.module.UserLevel;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -19,10 +17,11 @@ public class ModuleEntry {
     @GeneratedValue
     private long id;
 
-    private String key;
+    private String entryKey;
 
-    private String value;
+    private String entryValue;
 
+    @Enumerated(EnumType.STRING)
     private UserLevel userLevel;
 
 }

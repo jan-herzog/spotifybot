@@ -85,6 +85,7 @@ public class CallbackController {
         }
         repository.saveAndFlush(user);
         Cookie cookie = new Cookie("session", sessionManagementService.createSession(user));
+        cookie.setPath("/");
         cookie.setMaxAge(3600);
         return "redirect:/dashboard";
     }

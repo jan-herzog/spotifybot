@@ -3,10 +3,7 @@ package de.notecho.spotify.database.user.entities.module;
 import de.notecho.spotify.module.ModuleType;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -21,13 +18,14 @@ public class Module {
     @GeneratedValue
     private long id;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<ModuleEntry> entries;
 
+    @Enumerated(EnumType.STRING)
     private ModuleType moduleType;
 
     public ModuleEntry getEntry(String key) {
-        return entries.stream().filter(entry -> entry.getKey().equals(key)).findAny().orElse(null);
+        return entries.stream().filter(entry -> entry.getEntryKey().equals(key)).findAny().orElse(null);
     }
 
 }

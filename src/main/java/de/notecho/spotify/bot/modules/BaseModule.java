@@ -18,7 +18,7 @@ public abstract class BaseModule {
     public abstract void register(TwitchClient client);
 
     public void sendMessage(ModuleEntry entry, String... args) {
-        String result = entry.getValue();
+        String result = entry.getEntryValue();
         for (int i = 0; i < args.length; i += 2)
             result = result.replace(args[i], args[i + 1]);
         root.getClient().getChat().sendMessage(root.getLogin(), result);

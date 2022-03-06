@@ -15,15 +15,16 @@ import java.util.List;
 @AllArgsConstructor
 public class BotUser {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private long id;
 
     private String twitchId;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Module> modules;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<TokenPair> tokenPairs;
 
     public TokenPair twitchTokens() {

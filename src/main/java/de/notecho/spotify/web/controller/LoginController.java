@@ -23,6 +23,7 @@ public class LoginController {
         if (session.equalsIgnoreCase("null"))
             return "redirect:/";
         Cookie cookie = new Cookie("session", session);
+        cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
         return "redirect:/";
