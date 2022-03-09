@@ -39,6 +39,9 @@ public class VolumeCommand extends Command {
                     case '+' -> newPercent = currentVolume + Integer.parseInt(percent.substring(1));
                     case '-' -> newPercent = currentVolume - Integer.parseInt(percent.substring(1));
                 }
+            } else {
+                sendMessage(getModule(ModuleType.SYSTEM).getEntry("syntax"), "$USER", userName, "$USAGE", "!sVolume ((+/-)percent)");
+                return;
             }
             getRoot().getSpotifyApi().setVolumeForUsersPlayback(newPercent).build().execute();
             sendMessage(setVolume, "$USER", userName, "$VOLUME", String.valueOf(newPercent));
