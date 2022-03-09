@@ -20,14 +20,7 @@ public class SongCommand extends Command {
     @Override
     @SneakyThrows
     public void exec(String userName, String id, UserLevel userLevel, String[] args) {
-        for (ModuleEntry entry : getModule().getEntries()) {
-            System.out.println(entry.getEntryKey());
-        }
         CurrentlyPlaying currentlyPlaying = getRoot().getSpotifyApi().getUsersCurrentlyPlayingTrack().build().execute();
-        if (currentlyPlaying == null) {
-            sendMessage(getModule(ModuleType.SYSTEM).getEntry("spotifyNotReachable"), "$USER", userName);
-            return;
-        }
         if (!currentlyPlaying.getIs_playing()) {
             sendMessage(getModule().getEntry("notPlaying"), "$USER", userName);
             return;

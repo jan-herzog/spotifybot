@@ -6,6 +6,7 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import de.notecho.spotify.bot.instance.BotInstance;
 import de.notecho.spotify.database.user.entities.module.Module;
+import de.notecho.spotify.module.ModuleType;
 import de.notecho.spotify.module.UserLevel;
 
 import java.util.Arrays;
@@ -37,7 +38,11 @@ public abstract class Command extends BaseModule {
             if (getModule().getModuleType().getTrigger().equalsIgnoreCase(command.replace("!", ""))) {
                 UserLevel userLevel = UserLevel.get(event.getPermissions());
                 if (!isCooldown() || userLevel.isHigherOrEquals(UserLevel.MOD))
-                    exec(user.getName(), user.getId(), userLevel, args);
+                    try {
+                        exec(user.getName(), user.getId(), userLevel, args);
+                    } catch (NullPointerException e) {
+                        sendMessage(getModule(ModuleType.SYSTEM).getEntry("spotifyNotReachable"), "$USER", user.getName());
+                    }
             }
         };
     }

@@ -21,12 +21,8 @@ public class LastSongCommand extends Command {
     @SneakyThrows
     public void exec(String userName, String id, UserLevel userLevel, String[] args) {
         PagingCursorbased<PlayHistory> historyPagingCursorbased = getRoot().getSpotifyApi().getCurrentUsersRecentlyPlayedTracks().limit(1).build().execute();
-        if (historyPagingCursorbased == null) {
-            sendMessage(getModule(ModuleType.SYSTEM).getEntry("spotifyNotReachable"), "$USER", userName);
-            return;
-        }
         String trackId = historyPagingCursorbased.getItems()[0].getTrack().getId();
         Track track = getRoot().getSpotifyApi().getTrack(trackId).build().execute();
-        sendMessage(getModule().getEntry("lastSong"), "$USER", userName, "$SONG", track.getName(), "$ARTISTS", SpotifyUtils.getArtists(track));
+        sendMessage(getModule().getEntry("lastSong"), "$USER", userName, "$LASTSONG", track.getName(), "$ARTISTS", SpotifyUtils.getArtists(track));
     }
 }
