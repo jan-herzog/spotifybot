@@ -56,7 +56,7 @@ public class CallbackController {
             user.spotifyTokens().setAccessToken(codeCredentials.getAccessToken());
             user.spotifyTokens().setRefreshToken(codeCredentials.getRefreshToken());
         } else
-            user.getTokenPairs().add(new TokenPair(0L, codeCredentials.getAccessToken(), codeCredentials.getRefreshToken(), TokenType.SPOTIFY));
+            user.addTokenPair(new TokenPair(0L, codeCredentials.getAccessToken(), codeCredentials.getRefreshToken(), TokenType.SPOTIFY));
         repository.saveAndFlush(user);
         botInstanceManagementService.startInstance(user);
         return "redirect:/dashboard";
