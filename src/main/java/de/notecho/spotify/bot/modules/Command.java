@@ -41,7 +41,10 @@ public abstract class Command extends BaseModule {
                     try {
                         exec(user.getName(), user.getId(), userLevel, args);
                     } catch (NullPointerException e) {
+                        e.printStackTrace();
                         sendMessage(getModule(ModuleType.SYSTEM).getEntry("spotifyNotReachable"), "$USER", user.getName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
             }
         };
