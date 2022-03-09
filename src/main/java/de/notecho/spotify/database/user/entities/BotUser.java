@@ -3,6 +3,8 @@ package de.notecho.spotify.database.user.entities;
 import de.notecho.spotify.database.user.entities.module.Module;
 import de.notecho.spotify.module.TokenType;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,10 +23,12 @@ public class BotUser {
 
     private String twitchId;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<Module> modules;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<TokenPair> tokenPairs;
 
     public TokenPair twitchTokens() {

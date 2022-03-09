@@ -2,6 +2,8 @@ package de.notecho.spotify.database.user.entities.module;
 
 import de.notecho.spotify.module.ModuleType;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,7 +20,8 @@ public class Module {
     @GeneratedValue
     private long id;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<ModuleEntry> entries;
 
     @Enumerated(EnumType.STRING)
