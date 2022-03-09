@@ -9,7 +9,9 @@ import de.notecho.spotify.SpotifyBotApplication;
 import de.notecho.spotify.bot.BotInstanceManagementService;
 import de.notecho.spotify.bot.modules.BaseModule;
 import de.notecho.spotify.database.user.entities.BotUser;
+import de.notecho.spotify.database.user.entities.TokenPair;
 import de.notecho.spotify.database.user.entities.module.Module;
+import de.notecho.spotify.database.user.repository.TokenPairRepository;
 import de.notecho.spotify.database.user.repository.UserRepository;
 import de.notecho.spotify.module.TokenType;
 import de.notecho.spotify.utils.logger.LogType;
@@ -49,6 +51,7 @@ public class BotInstance {
 
     @SneakyThrows
     public BotInstance(BotUser user, Environment environment) {
+        long start = System.currentTimeMillis();
         this.context = SpotifyBotApplication.getInstance();
         this.user = user;
         this.spotifyApi = new SpotifyApi.Builder()
@@ -67,20 +70,23 @@ public class BotInstance {
                     .withDefaultAuthToken(new OAuth2Credential("twitch", "oauth:" + user.twitchTokens().getAccessToken()))
                     .withChatAccount(new OAuth2Credential("twitch", "oauth:" + user.twitchTokens().getAccessToken()))
                     .build();
-        User twitchUser = client.getHelix().getUsers(null, null, null).execute().getUsers().get(0);
+        User twitchUser = client.getHelix().getUsers(user.twitchTokens().getAccessToken(), null, null).execute().getUsers().get(0);
         this.login = twitchUser.getLogin();
         this.client.getChat().joinChannel(this.login);
-        this.id = twitchUser.getId();
+        this.id = user.getTwitchId();
         for (Module module : this.user.getModules()) {
             if (module.getModuleType().getCommandClass() == null)
                 continue;
             this.modules.add((BaseModule) module.getModuleType().getCommandClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
         }
+        for (BaseModule module : this.modules)
+            module.register(client);
         updateTokens();
+        Logger.log(LogType.DEBUG, "Started BotInstance(" + twitchUser.getLogin() + ", " + user.getTwitchId() + ") in " + (System.currentTimeMillis() - start) + "ms.", twitchUser.getLogin(), user.getTwitchId(), (System.currentTimeMillis() - start) + "ms");
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                if (nextCheck >= System.currentTimeMillis())
+                if (nextCheck <= System.currentTimeMillis())
                     updateTokens();
             }
         }, 0, 1000);
@@ -110,11 +116,13 @@ public class BotInstance {
             spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
             spotifyApi.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
             user.spotifyTokens().setAccessToken(authorizationCodeCredentials.getAccessToken());
-            user.spotifyTokens().setRefreshToken(authorizationCodeCredentials.getRefreshToken());
             Logger.log(LogType.DEBUG, "Got new Spotify Token for " + login + ", expires in: " + authorizationCodeCredentials.getExpiresIn() + " | " + authorizationCodeCredentials.getAccessToken().substring(0, 10) + "...", "Spotify", login, String.valueOf(authorizationCodeCredentials.getExpiresIn()), authorizationCodeCredentials.getAccessToken().substring(0, 10) + "...");
         } catch (BadRequestException e) {
-            user.getTokenPairs().removeIf(tokenPair -> tokenPair.getTokenType().equals(TokenType.SPOTIFY));
+            TokenPair spotifyTokens = user.spotifyTokens();
+            user.getTokenPairs().remove(spotifyTokens);
+            context.getBean(TokenPairRepository.class).delete(spotifyTokens);
             Logger.log(LogType.INFO, login + " revoked his access token so it was removed from the database.", login, "revoked", "database");
+            context.getBean(UserRepository.class).saveAndFlush(user);
             context.getBean(BotInstanceManagementService.class).stopInstance(user);
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
