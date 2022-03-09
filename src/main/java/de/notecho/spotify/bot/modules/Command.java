@@ -22,10 +22,7 @@ public abstract class Command extends BaseModule {
 
     private Consumer<ChannelMessageEvent> channelMessageEvent() {
         return event -> {
-            EventUser eventUser = event.getUser();
             String message = event.getMessage();
-            if (eventUser.getId().equals(getRoot().getId()))
-                return;
             EventChannel channel = event.getChannel();
             if (!channel.getId().equals(getRoot().getId()))
                 return;
