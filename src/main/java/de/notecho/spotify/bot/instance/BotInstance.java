@@ -82,7 +82,7 @@ public class BotInstance {
         for (BaseModule module : this.modules)
             module.register(client);
         updateTokens();
-        Logger.log(LogType.DEBUG, "Started BotInstance(" + twitchUser.getLogin() + ", " + user.getTwitchId() + ") in " + (System.currentTimeMillis() - start) + "ms.", twitchUser.getLogin(), user.getTwitchId(), (System.currentTimeMillis() - start) + "ms");
+        Logger.log(LogType.DEBUG, "[" + user.getId() + "] Started BotInstance(" + twitchUser.getLogin() + ", " + user.getTwitchId() + ") in " + (System.currentTimeMillis() - start) + "ms.", twitchUser.getLogin(), user.getTwitchId(), (System.currentTimeMillis() - start) + "ms");
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -98,30 +98,21 @@ public class BotInstance {
             context.getBean(BotInstanceManagementService.class).stopInstance(user);
             return;
         }
-        OAuth2Credential credential = new OAuth2Credential("twitch", user.twitchTokens().getAccessToken());
-        credential.setRefreshToken(user.twitchTokens().getRefreshToken());
-        Optional<OAuth2Credential> credentialOptional = context.getBean(OAuth2IdentityProvider.class).refreshCredential(credential);
-        if (credentialOptional.isPresent()) {
-            credential = credentialOptional.get();
-            User twitchUser = client.getHelix().getUsers(credential.getAccessToken(), null, null).execute().getUsers().get(0);
-            id = twitchUser.getId();
-            login = twitchUser.getLogin();
-            user.twitchTokens().setAccessToken(credential.getAccessToken());
-            user.twitchTokens().setRefreshToken(credential.getRefreshToken());
-            Logger.log(LogType.DEBUG, "Got new Twitch Token for " + login + " | " + credential.getAccessToken(), "Twitch", login, credential.getAccessToken());
-        }
+        updateTwitchToken(user.twitchTokens());
+        if (user.chatAccountTokens() != null)
+            updateTwitchToken(user.chatAccountTokens());
         try {
             AuthorizationCodeRefreshRequest authorizationCodeRefreshRequest = spotifyApi.authorizationCodeRefresh().build();
             final AuthorizationCodeCredentials authorizationCodeCredentials = authorizationCodeRefreshRequest.execute();
             spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
             spotifyApi.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
             user.spotifyTokens().setAccessToken(authorizationCodeCredentials.getAccessToken());
-            Logger.log(LogType.DEBUG, "Got new Spotify Token for " + login + ", expires in: " + authorizationCodeCredentials.getExpiresIn() + " | " + authorizationCodeCredentials.getAccessToken().substring(0, 10) + "...", "Spotify", login, String.valueOf(authorizationCodeCredentials.getExpiresIn()), authorizationCodeCredentials.getAccessToken().substring(0, 10) + "...");
+            Logger.log(LogType.DEBUG, "[" + user.getId() + "] Got new Spotify Token for " + login + ", expires in: " + authorizationCodeCredentials.getExpiresIn() + " | " + authorizationCodeCredentials.getAccessToken().substring(0, 10) + "...", "Spotify", login, String.valueOf(authorizationCodeCredentials.getExpiresIn()), authorizationCodeCredentials.getAccessToken().substring(0, 10) + "...");
         } catch (BadRequestException e) {
             TokenPair spotifyTokens = user.spotifyTokens();
             user.getTokenPairs().remove(spotifyTokens);
             context.getBean(TokenPairRepository.class).delete(spotifyTokens);
-            Logger.log(LogType.INFO, login + " revoked his access token so it was removed from the database.", login, "revoked", "database");
+            Logger.log(LogType.INFO, "[" + user.getId() + "] " + login + " revoked his access token so it was removed from the database.", login, "revoked", "database");
             context.getBean(UserRepository.class).saveAndFlush(user);
             context.getBean(BotInstanceManagementService.class).stopInstance(user);
         } catch (IOException | SpotifyWebApiException | ParseException e) {
@@ -129,6 +120,23 @@ public class BotInstance {
         }
         context.getBean(UserRepository.class).saveAndFlush(user);
         nextCheck = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(50);
+    }
+
+    private void updateTwitchToken(TokenPair tokenPair) {
+        OAuth2Credential credential = new OAuth2Credential("twitch", tokenPair.getAccessToken());
+        credential.setRefreshToken(tokenPair.getRefreshToken());
+        Optional<OAuth2Credential> credentialOptional = context.getBean(OAuth2IdentityProvider.class).refreshCredential(credential);
+        if (credentialOptional.isPresent()) {
+            credential = credentialOptional.get();
+            User twitchUser = client.getHelix().getUsers(credential.getAccessToken(), null, null).execute().getUsers().get(0);
+            if (tokenPair.getTokenType().equals(TokenType.TWITCH)) {
+                id = twitchUser.getId();
+                login = twitchUser.getLogin();
+            }
+            tokenPair.setAccessToken(credential.getAccessToken());
+            tokenPair.setRefreshToken(credential.getRefreshToken());
+            Logger.log(LogType.DEBUG, "[" + user.getId() + "] Got new Twitch Token(" + tokenPair.getTokenType().name() + ") for " + twitchUser.getLogin() + " | " + credential.getAccessToken(), "Twitch", tokenPair.getTokenType().name(), login, credential.getAccessToken());
+        }
     }
 
 
