@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class Logger {
 
-    private static String prefix = "SpotifyBot@VPS >>";
+    private static String prefix = "SpotifyBot >>";
     private static final SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
     private static final boolean debug = true;
 
