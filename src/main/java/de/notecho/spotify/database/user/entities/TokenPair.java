@@ -17,6 +17,7 @@ public class TokenPair {
     @GeneratedValue
     private long id;
 
+    @Column(length = 100000)
     private String accessToken;
 
     private String refreshToken;
