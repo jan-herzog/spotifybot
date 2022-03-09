@@ -111,9 +111,9 @@ public class BotInstance {
         } catch (BadRequestException e) {
             TokenPair spotifyTokens = user.spotifyTokens();
             user.getTokenPairs().remove(spotifyTokens);
+            context.getBean(UserRepository.class).saveAndFlush(user);
             context.getBean(TokenPairRepository.class).delete(spotifyTokens);
             Logger.log(LogType.INFO, "[" + user.getId() + "] " + login + " revoked his access token so it was removed from the database.", login, "revoked", "database");
-            context.getBean(UserRepository.class).saveAndFlush(user);
             context.getBean(BotInstanceManagementService.class).stopInstance(user);
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
