@@ -114,6 +114,8 @@ public class BotInstance {
             context.getBean(UserRepository.class).saveAndFlush(user);
             context.getBean(TokenPairRepository.class).delete(spotifyTokens);
             Logger.log(LogType.INFO, "[" + user.getId() + "] " + login + " revoked his access token so it was removed from the database.", login, "revoked", "database");
+            for (BaseModule module : this.modules)
+                module.unregister(client);
             context.getBean(BotInstanceManagementService.class).stopInstance(user);
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();

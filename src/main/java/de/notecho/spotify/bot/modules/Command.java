@@ -1,5 +1,6 @@
 package de.notecho.spotify.bot.modules;
 
+import com.github.philippheuer.events4j.api.domain.IEventSubscription;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
@@ -62,6 +63,14 @@ public abstract class Command extends BaseModule {
     public void register(TwitchClient client) {
         client.getEventManager().onEvent(ChannelMessageEvent.class, channelMessageEvent());
     }
+
+    @Override
+    public void unregister(TwitchClient client) {
+        for (IEventSubscription activeSubscription : client.getEventManager().getActiveSubscriptions())
+            if(activeSubscription.getConsumer() == channelMessageEvent())
+                activeSubscription.dispose();
+    }
+
 
     public abstract void exec(String userName, String id, UserLevel userLevel, String[] args);
 

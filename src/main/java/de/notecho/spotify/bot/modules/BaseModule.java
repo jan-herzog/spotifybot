@@ -18,6 +18,8 @@ public abstract class BaseModule {
 
     public abstract void register(TwitchClient client);
 
+    public abstract void unregister(TwitchClient client);
+
     public void sendMessage(ModuleEntry entry, String... args) {
         if (entry.getEntryValue().equalsIgnoreCase("--"))
             return;
