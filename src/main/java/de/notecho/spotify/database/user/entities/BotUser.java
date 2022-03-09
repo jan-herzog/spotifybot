@@ -7,6 +7,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -41,6 +42,11 @@ public class BotUser {
 
     public TokenPair chatAccountTokens() {
         return tokenPairs.stream().filter(tokenPair -> tokenPair.getTokenType().equals(TokenType.CHATACCOUNT)).findAny().orElse(null);
+    }
+
+    public void addTokenPair(TokenPair tokenPair) {
+        this.tokenPairs = new ArrayList<>(tokenPairs);
+        this.tokenPairs.add(tokenPair);
     }
 
 }
