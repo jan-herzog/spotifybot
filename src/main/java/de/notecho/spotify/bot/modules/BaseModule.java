@@ -19,6 +19,8 @@ public abstract class BaseModule {
     public abstract void register(TwitchClient client);
 
     public void sendMessage(ModuleEntry entry, String... args) {
+        if (entry.getEntryValue().equalsIgnoreCase("--"))
+            return;
         String result = entry.getEntryValue();
         for (int i = 0; i < args.length; i += 2)
             result = result.replace(args[i], args[i + 1]);
