@@ -23,13 +23,13 @@ public class DashboardController {
 
     @GetMapping("/dashboard")
     public String dashboard(@CookieValue(name = "session", defaultValue = "null") String session, Model model) {
-        if(session.equals("null"))
-            return "redirect:/login";
         BotUser user = sessionManagementService.getUser(session);
+        if(session.equals("null") || user == null)
+            return "redirect:/login";
         List<User> twitchUsers = twitchClient.getHelix().getUsers(user.twitchTokens().getAccessToken(), null, null).execute().getUsers();
         User twitchUser = twitchUsers.get(0);
         model.addAttribute("username", twitchUser.getLogin());
-        model.addAttribute("spotifyConnected", user.spotifyTokens() == null);
+        model.addAttribute("spotifyConnected", user.spotifyTokens() != null);
         return "dashboard";
     }
 

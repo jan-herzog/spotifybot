@@ -87,6 +87,7 @@ public class CallbackController {
         Cookie cookie = new Cookie("session", sessionManagementService.createSession(user));
         cookie.setPath("/");
         cookie.setMaxAge(3600);
+        response.addCookie(cookie);
         return "redirect:/dashboard";
     }
 
