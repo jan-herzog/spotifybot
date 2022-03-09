@@ -3,6 +3,8 @@ package de.notecho.spotify.bot;
 import de.notecho.spotify.bot.instance.BotInstance;
 import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.repository.UserRepository;
+import de.notecho.spotify.utils.logger.LogType;
+import de.notecho.spotify.utils.logger.Logger;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -10,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class BotInstanceManagementService {
@@ -22,8 +27,14 @@ public class BotInstanceManagementService {
     @Autowired
     public BotInstanceManagementService(Environment environment, UserRepository userRepository) {
         this.environment = environment;
-        for (BotUser user : userRepository.findAllByOrderByIdAsc())
-            startInstance(user);
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        Logger.log(LogType.DEBUG, "Fetching users in 15 seconds...", "users", "15");
+        service.schedule(() -> {
+            Logger.log(LogType.DEBUG, "Fetching users...", "users");
+            for (BotUser user : userRepository.findAllByOrderByIdAsc())
+                startInstance(user);
+            Logger.log(LogType.DEBUG, "Fetched users!", "users");
+        }, 15, TimeUnit.SECONDS);
     }
 
     public void startInstance(BotUser user) {
