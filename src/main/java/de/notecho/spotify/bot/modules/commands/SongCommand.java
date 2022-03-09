@@ -4,6 +4,7 @@ import de.notecho.spotify.bot.instance.BotInstance;
 import de.notecho.spotify.bot.modules.Command;
 import de.notecho.spotify.database.user.entities.module.Module;
 import de.notecho.spotify.database.user.entities.module.ModuleEntry;
+import de.notecho.spotify.module.ModuleType;
 import de.notecho.spotify.module.UserLevel;
 import de.notecho.spotify.utils.SpotifyUtils;
 import lombok.SneakyThrows;
@@ -19,10 +20,12 @@ public class SongCommand extends Command {
     @Override
     @SneakyThrows
     public void exec(String userName, String id, UserLevel userLevel, String[] args) {
-        ModuleEntry playingEntry = getModule().getEntry("playingSong");
+        for (ModuleEntry entry : getModule().getEntries()) {
+            System.out.println(entry.getEntryKey());
+        }
         CurrentlyPlaying currentlyPlaying = getRoot().getSpotifyApi().getUsersCurrentlyPlayingTrack().build().execute();
         if (currentlyPlaying == null) {
-            sendMessage(getModule().getEntry("spotifyNotReachable"), "$USER", userName);
+            sendMessage(getModule(ModuleType.SYSTEM).getEntry("spotifyNotReachable"), "$USER", userName);
             return;
         }
         if (!currentlyPlaying.getIs_playing()) {
@@ -31,6 +34,6 @@ public class SongCommand extends Command {
         }
         String uri = SpotifyUtils.getUriFromJson(getRoot().getSpotifyApi().getUsersCurrentlyPlayingTrack().build().getJson());
         Track track = getRoot().getSpotifyApi().getTrack(SpotifyUtils.getIdFromUri(uri)).build().execute();
-        sendMessage(playingEntry, "$USER", userName, "$SONG", track.getName(), "$ARTISTS", SpotifyUtils.getArtists(track));
+        sendMessage(getModule().getEntry("playingSong"), "$USER", userName, "$SONG", track.getName(), "$ARTISTS", SpotifyUtils.getArtists(track));
     }
 }
