@@ -7,14 +7,21 @@ import de.notecho.spotify.database.user.entities.module.ModuleEntry;
 import de.notecho.spotify.module.ModuleType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+import java.util.function.Consumer;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public abstract class BaseModule {
 
-    private Module module;
+    private final Module module;
 
-    private BotInstance root;
+    private final BotInstance root;
+
+    @Setter
+    private Consumer<?> eventConsumer;
 
     public abstract void register(TwitchClient client);
 

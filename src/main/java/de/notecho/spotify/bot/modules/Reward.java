@@ -13,6 +13,7 @@ public abstract class Reward extends BaseModule {
 
     public Reward(Module module, BotInstance root) {
         super(module, root);
+        setEventConsumer(channelPointsRedemptionEvent());
     }
 
     private Consumer<RewardRedeemedEvent> channelPointsRedemptionEvent() {
@@ -30,13 +31,13 @@ public abstract class Reward extends BaseModule {
 
     @Override
     public void register(TwitchClient client) {
-        client.getEventManager().onEvent(RewardRedeemedEvent.class, channelPointsRedemptionEvent());
+        client.getEventManager().onEvent(RewardRedeemedEvent.class, (Consumer<RewardRedeemedEvent>) getEventConsumer());
     }
 
     @Override
     public void unregister(TwitchClient client) {
         for (IEventSubscription activeSubscription : client.getEventManager().getActiveSubscriptions())
-            if(activeSubscription.getConsumer() == channelPointsRedemptionEvent())
+            if(activeSubscription.getConsumer() == getEventConsumer())
                 activeSubscription.dispose();
     }
 

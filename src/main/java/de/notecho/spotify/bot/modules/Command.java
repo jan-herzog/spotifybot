@@ -20,6 +20,7 @@ public abstract class Command extends BaseModule {
 
     public Command(Module module, BotInstance root) {
         super(module, root);
+        setEventConsumer(channelMessageEvent());
     }
 
     private Consumer<ChannelMessageEvent> channelMessageEvent() {
@@ -61,13 +62,13 @@ public abstract class Command extends BaseModule {
 
     @Override
     public void register(TwitchClient client) {
-        client.getEventManager().onEvent(ChannelMessageEvent.class, channelMessageEvent());
+        client.getEventManager().onEvent(ChannelMessageEvent.class, (Consumer<ChannelMessageEvent>) getEventConsumer());
     }
 
     @Override
     public void unregister(TwitchClient client) {
         for (IEventSubscription activeSubscription : client.getEventManager().getActiveSubscriptions())
-            if(activeSubscription.getConsumer() == channelMessageEvent())
+            if(activeSubscription.getConsumer() == getEventConsumer())
                 activeSubscription.dispose();
     }
 
