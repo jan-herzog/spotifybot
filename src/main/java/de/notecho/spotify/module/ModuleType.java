@@ -24,7 +24,7 @@ public enum ModuleType {
 
     private final String trigger;
 
-    private final Class<?> commandClass;
+    private final Class<?> moduleClass;
 
 
 }
