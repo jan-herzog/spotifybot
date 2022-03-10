@@ -116,6 +116,7 @@ public class BotInstance {
             Logger.log(LogType.INFO, "[" + user.getId() + "] " + login + " revoked his access token so it was removed from the database.", login, "revoked", "database");
             for (BaseModule module : this.modules)
                 module.unregister(client);
+            client.getChat().leaveChannel(this.login);
             context.getBean(BotInstanceManagementService.class).stopInstance(user);
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
