@@ -22,7 +22,7 @@ public class VolumeCommand extends Command {
         if (args.length >= 1) {
             ModuleEntry setVolume = getModule().getEntry("setVolume");
             if (!userLevel.isHigherOrEquals(setVolume.getUserLevel())) {
-                sendMessage(getModule(ModuleType.SYSTEM).getEntry("noPerms"), "$USER", userName, "$ROLE", userLevel.getPrettyName());
+                sendMessage(getModule(ModuleType.SYSTEM).getEntry("noPerms"), "$USER", userName, "$ROLE", setVolume.getUserLevel().getPrettyName());
                 return;
             }
             String percent = args[0];
@@ -49,7 +49,7 @@ public class VolumeCommand extends Command {
         }
         ModuleEntry showVolume = getModule().getEntry("showVolume");
         if (!userLevel.isHigherOrEquals(showVolume.getUserLevel())) {
-            sendMessage(getModule(ModuleType.SYSTEM).getEntry("noPerms"), "$USER", userName, "$ROLE", userLevel.getPrettyName());
+            sendMessage(getModule(ModuleType.SYSTEM).getEntry("noPerms"), "$USER", userName, "$ROLE", showVolume.getUserLevel().getPrettyName());
             return;
         }
         CurrentlyPlayingContext playingContext = getRoot().getSpotifyApi().getInformationAboutUsersCurrentPlayback().build().execute();

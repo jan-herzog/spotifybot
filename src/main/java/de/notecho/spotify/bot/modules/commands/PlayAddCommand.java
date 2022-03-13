@@ -23,7 +23,7 @@ public class PlayAddCommand extends Command {
     public void exec(String userName, String id, UserLevel userLevel, String[] args) {
         ModuleEntry sPlayAdd = getModule().getEntry("sPlayAdd");
         if (!userLevel.isHigherOrEquals(sPlayAdd.getUserLevel())) {
-            sendMessage(getModule(ModuleType.SYSTEM).getEntry("noPerms"), "$USER", userName, "$ROLE", userLevel.getPrettyName());
+            sendMessage(getModule(ModuleType.SYSTEM).getEntry("noPerms"), "$USER", userName, "$ROLE", sPlayAdd.getUserLevel().getPrettyName());
             return;
         }
         StringBuilder searchQuery = new StringBuilder();
