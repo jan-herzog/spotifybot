@@ -1,8 +1,10 @@
 package de.notecho.spotify.bot.modules;
 
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.domain.IEventSubscription;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
+import com.github.twitch4j.pubsub.PubSubSubscription;
 import com.github.twitch4j.pubsub.domain.ChannelPointsUser;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import de.notecho.spotify.bot.instance.BotInstance;
@@ -14,6 +16,8 @@ import java.util.Collections;
 import java.util.function.Consumer;
 
 public abstract class Reward extends BaseModule {
+
+    private PubSubSubscription subscription;
 
     public Reward(Module module, BotInstance root) {
         super(module, root);
@@ -43,11 +47,13 @@ public abstract class Reward extends BaseModule {
 
     @Override
     public void register(TwitchClient client) {
+        this.subscription = client.getPubSub().listenForChannelPointsRedemptionEvents(new OAuth2Credential("twitch", getRoot().getUser().twitchTokens().getAccessToken()), getRoot().getUser().getTwitchId());
         client.getEventManager().onEvent(RewardRedeemedEvent.class, (Consumer<RewardRedeemedEvent>) getEventConsumer());
     }
 
     @Override
     public void unregister(TwitchClient client) {
+        client.getPubSub().unsubscribeFromTopic(this.subscription);
         for (IEventSubscription activeSubscription : client.getEventManager().getActiveSubscriptions())
             if (activeSubscription.getConsumer() == getEventConsumer())
                 activeSubscription.dispose();
