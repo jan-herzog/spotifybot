@@ -5,7 +5,6 @@ import de.notecho.spotify.bot.instance.BotInstance;
 import de.notecho.spotify.database.user.entities.module.Module;
 import de.notecho.spotify.database.user.entities.module.ModuleEntry;
 import de.notecho.spotify.module.ModuleType;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

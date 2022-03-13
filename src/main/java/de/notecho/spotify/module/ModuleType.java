@@ -4,6 +4,7 @@ import de.notecho.spotify.bot.modules.commands.LastSongCommand;
 import de.notecho.spotify.bot.modules.commands.PlayAddCommand;
 import de.notecho.spotify.bot.modules.commands.SongCommand;
 import de.notecho.spotify.bot.modules.commands.VolumeCommand;
+import de.notecho.spotify.bot.modules.reward.SongrequestReward;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -19,7 +20,7 @@ public enum ModuleType {
     PLAYADD("splayadd", PlayAddCommand.class),
     SKIP("sskip", null),
     PREVIOUS("sprevious", null),
-    SONGREQUEST(null, null),
+    SONGREQUEST("srRedeem", SongrequestReward.class),
     SYSTEM(null, null);
 
     private final String trigger;

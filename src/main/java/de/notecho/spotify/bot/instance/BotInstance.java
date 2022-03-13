@@ -75,9 +75,9 @@ public class BotInstance {
         this.client.getChat().joinChannel(this.login);
         this.id = user.getTwitchId();
         for (Module module : this.user.getModules()) {
-            if (module.getModuleType().getCommandClass() == null)
+            if (module.getModuleType().getModuleClass() == null)
                 continue;
-            this.modules.add((BaseModule) module.getModuleType().getCommandClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
+            this.modules.add((BaseModule) module.getModuleType().getModuleClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
         }
         for (BaseModule module : this.modules)
             module.register(client);

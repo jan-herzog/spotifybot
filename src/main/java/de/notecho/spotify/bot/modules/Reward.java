@@ -2,11 +2,15 @@ package de.notecho.spotify.bot.modules;
 
 import com.github.philippheuer.events4j.api.domain.IEventSubscription;
 import com.github.twitch4j.TwitchClient;
+import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.pubsub.domain.ChannelPointsUser;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import de.notecho.spotify.bot.instance.BotInstance;
+import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.entities.module.Module;
+import de.notecho.spotify.module.ModuleType;
 
+import java.util.Collections;
 import java.util.function.Consumer;
 
 public abstract class Reward extends BaseModule {
@@ -20,12 +24,20 @@ public abstract class Reward extends BaseModule {
         return event -> {
             String channelId = event.getRedemption().getChannelId();
             String message = event.getRedemption().getUserInput();
-            if(!channelId.equals(getRoot().getId()))
+            if (!channelId.equals(getRoot().getId()))
                 return;
-            if(!event.getRedemption().getReward().getTitle().equalsIgnoreCase(getModule().getEntry(getModule().getModuleType().getTrigger()).getEntryValue()))
+            if (!event.getRedemption().getReward().getTitle().equalsIgnoreCase(getModule().getEntry(getModule().getModuleType().getTrigger()).getEntryValue()))
                 return;
             ChannelPointsUser user = event.getRedemption().getUser();
-            exec(user.getLogin(), user.getId(), message);
+            try {
+                exec(event, user.getLogin(), user.getId(), message);
+            } catch (NullPointerException e) {
+                setRedemptionStatus(event, RedemptionStatus.CANCELED);
+                sendMessage(getModule(ModuleType.SYSTEM).getEntry("spotifyNotReachable"), "$USER", user.getLogin());
+            } catch (Exception e) {
+                setRedemptionStatus(event, RedemptionStatus.CANCELED);
+                e.printStackTrace();
+            }
         };
     }
 
@@ -37,9 +49,21 @@ public abstract class Reward extends BaseModule {
     @Override
     public void unregister(TwitchClient client) {
         for (IEventSubscription activeSubscription : client.getEventManager().getActiveSubscriptions())
-            if(activeSubscription.getConsumer() == getEventConsumer())
+            if (activeSubscription.getConsumer() == getEventConsumer())
                 activeSubscription.dispose();
     }
 
-    public abstract void exec(String userName, String id, String message);
+    public abstract void exec(RewardRedeemedEvent event, String userName, String id, String message);
+
+    protected void setRedemptionStatus(RewardRedeemedEvent event, RedemptionStatus status) {
+        BotUser user = getRoot().getUser();
+        getRoot().getClient().getHelix().updateRedemptionStatus(
+                user.twitchTokens().getAccessToken(),
+                user.getTwitchId(),
+                event.getRedemption().getReward().getId(),
+                Collections.singletonList(event.getRedemption().getId()),
+                status
+        ).execute();
+    }
+
 }
