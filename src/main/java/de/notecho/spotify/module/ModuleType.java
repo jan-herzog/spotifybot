@@ -12,7 +12,7 @@ public enum ModuleType {
     SONG("song", SongCommand.class),
     LASTSONG("lastsong", LastSongCommand.class),
     VOLUME("svolume", VolumeCommand.class),
-    PAUSE("spause", null),
+    PAUSE("spause", PauseCommand.class),
     PLAY("splay", PlayCommand.class),
     PLAYADD("splayadd", PlayAddCommand.class),
     SKIP("sskip", null),
