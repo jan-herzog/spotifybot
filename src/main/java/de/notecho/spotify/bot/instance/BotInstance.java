@@ -102,6 +102,7 @@ public class BotInstance {
         if (user.chatAccountTokens() != null)
             updateTwitchToken(user.chatAccountTokens());
         try {
+            this.spotifyApi.setRefreshToken(user.spotifyTokens().getRefreshToken());
             AuthorizationCodeRefreshRequest authorizationCodeRefreshRequest = spotifyApi.authorizationCodeRefresh().build();
             final AuthorizationCodeCredentials authorizationCodeCredentials = authorizationCodeRefreshRequest.execute();
             spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
@@ -118,6 +119,7 @@ public class BotInstance {
                 module.unregister(client);
             client.getChat().leaveChannel(this.login);
             context.getBean(BotInstanceManagementService.class).stopInstance(user);
+            return;
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
