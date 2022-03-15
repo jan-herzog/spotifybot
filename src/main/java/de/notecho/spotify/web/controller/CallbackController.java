@@ -7,6 +7,7 @@ import com.github.twitch4j.helix.domain.User;
 import de.notecho.spotify.bot.BotInstanceManagementService;
 import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.entities.TokenPair;
+import de.notecho.spotify.database.user.repository.TokenPairRepository;
 import de.notecho.spotify.database.user.repository.UserRepository;
 import de.notecho.spotify.module.DefaultModules;
 import de.notecho.spotify.module.TokenType;
@@ -43,6 +44,8 @@ public class CallbackController {
 
     private final UserRepository repository;
 
+    private final TokenPairRepository tokenPairRepository;
+
     @SneakyThrows
     @GetMapping("/spotify/callback")
     public String spotifyCallback(@RequestParam(name = "code", defaultValue = "null") String code, @CookieValue(name = "session", defaultValue = "null") String session, Model model) {
@@ -63,8 +66,17 @@ public class CallbackController {
     }
 
     @GetMapping("/spotify/unlink")
-    public String spotifyUnlink(Model model) {
-        return "index";
+    public String spotifyUnlink(@CookieValue(name = "session", defaultValue = "null") String session) {
+        BotUser user = sessionManagementService.getUser(session);
+        if (session.equals("null") || user == null)
+            return "redirect:/login";
+        TokenPair tokenPair = user.spotifyTokens();
+        if (tokenPair == null)
+            return "redirect:/dashboard";
+        user.getTokenPairs().remove(tokenPair);
+        repository.saveAndFlush(user);
+        tokenPairRepository.delete(tokenPair);
+        return "redirect:/dashboard";
     }
 
     @GetMapping("/twitch/callback")
