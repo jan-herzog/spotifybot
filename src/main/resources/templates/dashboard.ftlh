@@ -48,8 +48,7 @@
                 <div class="col text-end align-self-center">
                     <div>
                         <#if spotifyConnected>
-                            <a class="btn btn-danger btn-l" role="button" href="/spotify/unlink">Spotify
-                                connected</a>
+                            <a class="btn btn-danger btn-l" role="button" href="/spotify/unlink">Disconnect Spotify</a>
                         <#else>
                             <a class="btn btn-dark btn-lg" role="button"
                                href="/spotify/login">Connect
