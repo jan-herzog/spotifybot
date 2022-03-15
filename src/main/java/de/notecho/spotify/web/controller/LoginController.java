@@ -1,5 +1,6 @@
 package de.notecho.spotify.web.controller;
 
+import de.notecho.spotify.config.BotConfiguration;
 import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.web.session.SessionManagementService;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,22 @@ public class LoginController {
 
     private final SessionManagementService sessionManagementService;
 
+    private final BotConfiguration configuration;
+
     @GetMapping("/login")
     public String login(@CookieValue(name = "session", defaultValue = "null") String session, Model model) {
         BotUser user = sessionManagementService.getUser(session);
         if (session.equals("null") || user == null)
-            return "redirect:https://id.twitch.tv/oauth2/authorize?client_id=41cemr1kitmxxmv15o47v152b78xzr&redirect_uri=https://spitchbot.com/twitch/callback/&response_type=code&scope=user:read:email user_read";
+            return "redirect:" + configuration.getTwitchLink();
         return "redirect:/dashboard";
+    }
+
+    @GetMapping("/spotify/login")
+    public String login(@CookieValue(name = "session", defaultValue = "null") String session) {
+        BotUser user = sessionManagementService.getUser(session);
+        if (session.equals("null") || user == null)
+            return "redirect:/login";
+        return "redirect:" + configuration.getSpotifyLink();
     }
 
     @GetMapping("/logout")
