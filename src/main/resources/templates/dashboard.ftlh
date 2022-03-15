@@ -48,7 +48,7 @@
                 <div class="col text-end align-self-center">
                     <div>
                         <#if spotifyConnected>
-                            <a class="btn btn-dark btn-lg disabled" role="button" href="/spotify/unlink">Spotify
+                            <a class="btn btn-danger btn-l" role="button" href="/spotify/unlink">Spotify
                                 connected</a>
                         <#else>
                             <a class="btn btn-dark btn-lg" role="button"
