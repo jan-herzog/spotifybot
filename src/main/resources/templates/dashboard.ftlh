@@ -52,7 +52,7 @@
                                 connected</a>
                         <#else>
                             <a class="btn btn-dark btn-lg" role="button"
-                               href="https://accounts.spotify.com/de/authorize?client_id=551e70c923a6485889ff1c8f0576571b&response_type=code&scope=user-modify-playback-state playlist-modify-private  playlist-read-collaborative playlist-read-private playlist-modify-public streaming app-remote-control user-library-modify user-library-read user-read-currently-playing user-read-playback-state user-read-recently-played user-top-read user-read-playback-position&redirect_uri=https://spitchbot.com/spotify/callback">Connect
+                               href="/spotify/login">Connect
                                 Spotify</a>
                         </#if>
                     </div>
