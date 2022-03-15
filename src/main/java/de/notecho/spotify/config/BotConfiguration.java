@@ -37,6 +37,9 @@ public class BotConfiguration {
     @Value("${twitch.link}")
     private String twitchLink;
 
+    @Value("${twitch.account.link}")
+    private String twitchAccountLink;
+
     @Value("${twitch.uri}")
     private String twitchUri;
 
