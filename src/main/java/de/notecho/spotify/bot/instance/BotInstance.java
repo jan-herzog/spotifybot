@@ -8,6 +8,7 @@ import com.github.twitch4j.helix.domain.User;
 import de.notecho.spotify.SpotifyBotApplication;
 import de.notecho.spotify.bot.BotInstanceManagementService;
 import de.notecho.spotify.bot.modules.BaseModule;
+import de.notecho.spotify.config.BotConfiguration;
 import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.entities.TokenPair;
 import de.notecho.spotify.database.user.entities.module.Module;
@@ -59,17 +60,21 @@ public class BotInstance {
                 .setClientSecret(environment.getProperty("spotify.clientSecret"))
                 .setAccessToken(user.spotifyTokens().getAccessToken())
                 .setRefreshToken(user.spotifyTokens().getRefreshToken())
-                .setRedirectUri(SpotifyHttpManager.makeUri("https://spitchbot.com/spotify/callback"))
+                .setRedirectUri(SpotifyHttpManager.makeUri(environment.getProperty("spotify.uri")))
                 .build();
         if (user.chatAccountTokens() == null)
             this.client = context.getBean(TwitchClient.class);
-        else
+        else {
+            updateTwitchToken(user.chatAccountTokens());
             this.client = TwitchClientBuilder.builder()
+                    .withEnableHelix(true)
                     .withEnablePubSub(true)
                     .withEnableChat(true)
-                    .withDefaultAuthToken(new OAuth2Credential("twitch", "oauth:" + user.twitchTokens().getAccessToken()))
-                    .withChatAccount(new OAuth2Credential("twitch", "oauth:" + user.twitchTokens().getAccessToken()))
+                    .withCredentialManager(context.getBean(BotConfiguration.class).getAccountCredentialManager())
+                    .withDefaultAuthToken(new OAuth2Credential("twitch", "oauth:" + user.chatAccountTokens().getAccessToken()))
+                    .withChatAccount(new OAuth2Credential("twitch", "oauth:" + user.chatAccountTokens().getAccessToken()))
                     .build();
+        }
         User twitchUser = client.getHelix().getUsers(user.twitchTokens().getAccessToken(), null, null).execute().getUsers().get(0);
         this.login = twitchUser.getLogin();
         this.client.getChat().joinChannel(this.login);
@@ -133,13 +138,15 @@ public class BotInstance {
         Optional<OAuth2Credential> credentialOptional = context.getBean(OAuth2IdentityProvider.class).refreshCredential(credential);
         if (credentialOptional.isPresent()) {
             credential = credentialOptional.get();
+            tokenPair.setAccessToken(credential.getAccessToken());
+            tokenPair.setRefreshToken(credential.getRefreshToken());
+            if (client == null)
+                return;
             User twitchUser = client.getHelix().getUsers(credential.getAccessToken(), null, null).execute().getUsers().get(0);
             if (tokenPair.getTokenType().equals(TokenType.TWITCH)) {
                 id = twitchUser.getId();
                 login = twitchUser.getLogin();
             }
-            tokenPair.setAccessToken(credential.getAccessToken());
-            tokenPair.setRefreshToken(credential.getRefreshToken());
             Logger.log(LogType.DEBUG, "[" + user.getId() + "] Got new Twitch Token(" + tokenPair.getTokenType().name() + ") for " + twitchUser.getLogin() + " | " + credential.getAccessToken(), "Twitch", tokenPair.getTokenType().name(), login, credential.getAccessToken());
         }
     }

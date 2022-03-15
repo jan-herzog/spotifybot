@@ -25,8 +25,6 @@ public class AccountController {
 
     private final BotConfiguration configuration;
 
-    private final OAuth2IdentityProvider oAuth2IdentityProvider;
-
     private final UserRepository repository;
 
     private final TokenPairRepository tokenPairRepository;
@@ -36,7 +34,7 @@ public class AccountController {
         BotUser user = sessionManagementService.getUser(session);
         if (session.equals("null") || user == null)
             return "redirect:/login";
-        OAuth2Credential credentialByCode = oAuth2IdentityProvider.getCredentialByCode(code);
+        OAuth2Credential credentialByCode = configuration.getAccountIdentityProvider().getCredentialByCode(code);
         user.addTokenPair(TokenPair.builder().accessToken(credentialByCode.getAccessToken()).refreshToken(credentialByCode.getRefreshToken()).tokenType(TokenType.CHATACCOUNT).build());
         repository.saveAndFlush(user);
         return "redirect:/dashboard";
