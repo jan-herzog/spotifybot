@@ -26,7 +26,7 @@
                 <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link" href="/team">Team</a></li>
             </ul>
-            <a class="btn ms-auto" role="button" href="/login">Log In</a></div>
+            <a class="btn ms-auto" role="button" href="/login?force_verify=true">Log In</a></div>
     </div>
 </nav>
 <footer style="text-align: center;position: absolute;z-index: 2;bottom: 0;left: 50%;transform: translate(-50%);"><span

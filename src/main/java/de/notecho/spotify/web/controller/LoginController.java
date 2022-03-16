@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -22,10 +23,10 @@ public class LoginController {
     private final BotConfiguration configuration;
 
     @GetMapping("/login")
-    public String login(@CookieValue(name = "session", defaultValue = "null") String session, Model model) {
+    public String login(@CookieValue(name = "session", defaultValue = "null") String session, @RequestParam("force_verify") boolean forceVerify, Model model) {
         BotUser user = sessionManagementService.getUser(session);
         if (session.equals("null") || user == null)
-            return "redirect:" + configuration.getTwitchLink();
+            return "redirect:" + configuration.getTwitchLink() + (forceVerify ? "&force_verify=true" : "");
         return "redirect:/dashboard";
     }
 
