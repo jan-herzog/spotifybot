@@ -7,7 +7,6 @@ import com.github.twitch4j.helix.domain.User;
 import de.notecho.spotify.bot.BotInstanceManagementService;
 import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.entities.TokenPair;
-import de.notecho.spotify.database.user.repository.TokenPairRepository;
 import de.notecho.spotify.database.user.repository.UserRepository;
 import de.notecho.spotify.module.DefaultModules;
 import de.notecho.spotify.module.TokenType;
@@ -44,8 +43,6 @@ public class CallbackController {
 
     private final UserRepository repository;
 
-    private final TokenPairRepository tokenPairRepository;
-
     @SneakyThrows
     @GetMapping("/spotify/callback")
     public String spotifyCallback(@RequestParam(name = "code", defaultValue = "null") String code, @CookieValue(name = "session", defaultValue = "null") String session, Model model) {
@@ -75,7 +72,7 @@ public class CallbackController {
             return "redirect:/dashboard";
         user.getTokenPairs().remove(tokenPair);
         repository.saveAndFlush(user);
-        tokenPairRepository.delete(tokenPair);
+        botInstanceManagementService.stopInstance(user);
         return "redirect:/dashboard";
     }
 

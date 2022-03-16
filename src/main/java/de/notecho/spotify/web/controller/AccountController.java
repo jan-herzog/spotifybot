@@ -1,12 +1,10 @@
 package de.notecho.spotify.web.controller;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
-import com.github.twitch4j.TwitchClient;
+import de.notecho.spotify.bot.BotInstanceManagementService;
 import de.notecho.spotify.config.BotConfiguration;
 import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.entities.TokenPair;
-import de.notecho.spotify.database.user.repository.TokenPairRepository;
 import de.notecho.spotify.database.user.repository.UserRepository;
 import de.notecho.spotify.module.TokenType;
 import de.notecho.spotify.web.session.SessionManagementService;
@@ -27,7 +25,8 @@ public class AccountController {
 
     private final UserRepository repository;
 
-    private final TokenPairRepository tokenPairRepository;
+
+    private final BotInstanceManagementService botInstanceManagementService;
 
     @GetMapping("/account/callback")
     public String twitchCallback(@CookieValue(name = "session", defaultValue = "null") String session, @RequestParam(name = "code", defaultValue = "null") String code) {
@@ -37,6 +36,7 @@ public class AccountController {
         OAuth2Credential credentialByCode = configuration.getAccountIdentityProvider().getCredentialByCode(code);
         user.addTokenPair(TokenPair.builder().accessToken(credentialByCode.getAccessToken()).refreshToken(credentialByCode.getRefreshToken()).tokenType(TokenType.CHATACCOUNT).build());
         repository.saveAndFlush(user);
+        botInstanceManagementService.updateClient(user);
         return "redirect:/dashboard";
     }
 
@@ -48,9 +48,10 @@ public class AccountController {
         TokenPair tokenPair = user.chatAccountTokens();
         if (tokenPair == null)
             return "redirect:/dashboard";
+        System.out.println(tokenPair);
         user.getTokenPairs().remove(tokenPair);
         repository.saveAndFlush(user);
-        tokenPairRepository.delete(tokenPair);
+        botInstanceManagementService.updateClient(user);
         return "redirect:/dashboard";
     }
 
