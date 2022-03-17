@@ -44,7 +44,7 @@ public class PlayCommand extends Command {
             String uri = search.getItems()[0].getUri();
             CountryCode country = getRoot().getSpotifyApi().getCurrentUsersProfile().build().execute().getCountry();
             Track track = getRoot().getSpotifyApi().getTrack(uri.replace("spotify:track:", "")).build().execute();
-            if (Arrays.stream(track.getAvailableMarkets()).noneMatch(countryCode -> countryCode.equals(CountryCode.DE))) {
+            if (Arrays.stream(track.getAvailableMarkets()).noneMatch(countryCode -> countryCode.equals(country != null ? country : CountryCode.US))) {
                 sendMessage(getModule(ModuleType.SONGREQUEST).getEntry("notAvailable"), "$USER", userName, "$SONG", track.getName());
                 return;
             }
