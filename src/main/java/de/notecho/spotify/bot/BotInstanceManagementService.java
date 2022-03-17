@@ -44,11 +44,17 @@ public class BotInstanceManagementService {
     }
 
     public void stopInstance(BotUser user) {
-        activeInstances.removeIf(botInstance -> botInstance.getUser().equals(user));
+        BotInstance instance = getInstance(user);
+        instance.dispose();
+        activeInstances.remove(instance);
     }
 
     public BotInstance getInstance(BotUser user) {
         return activeInstances.stream().filter(botInstance -> botInstance.getUser().equals(user)).findAny().orElse(null);
+    }
+
+    public void updateClient(BotUser user) {
+        getInstance(user).updateClient();
     }
 
 }

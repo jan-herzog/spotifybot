@@ -8,10 +8,10 @@ import com.github.twitch4j.helix.domain.User;
 import de.notecho.spotify.SpotifyBotApplication;
 import de.notecho.spotify.bot.BotInstanceManagementService;
 import de.notecho.spotify.bot.modules.BaseModule;
+import de.notecho.spotify.config.BotConfiguration;
 import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.entities.TokenPair;
 import de.notecho.spotify.database.user.entities.module.Module;
-import de.notecho.spotify.database.user.repository.TokenPairRepository;
 import de.notecho.spotify.database.user.repository.UserRepository;
 import de.notecho.spotify.module.TokenType;
 import de.notecho.spotify.utils.logger.LogType;
@@ -35,9 +35,9 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class BotInstance {
 
-    private final BotUser user;
+    private BotUser user;
 
-    private final TwitchClient client;
+    private TwitchClient client = null;
 
     private final SpotifyApi spotifyApi;
 
@@ -59,35 +59,29 @@ public class BotInstance {
                 .setClientSecret(environment.getProperty("spotify.clientSecret"))
                 .setAccessToken(user.spotifyTokens().getAccessToken())
                 .setRefreshToken(user.spotifyTokens().getRefreshToken())
-                .setRedirectUri(SpotifyHttpManager.makeUri("https://spitchbot.com/spotify/callback"))
+                .setRedirectUri(SpotifyHttpManager.makeUri(environment.getProperty("spotify.uri")))
                 .build();
-        if (user.chatAccountTokens() == null)
-            this.client = context.getBean(TwitchClient.class);
-        else
-            this.client = TwitchClientBuilder.builder()
-                    .withEnablePubSub(true)
-                    .withEnableChat(true)
-                    .withDefaultAuthToken(new OAuth2Credential("twitch", "oauth:" + user.twitchTokens().getAccessToken()))
-                    .withChatAccount(new OAuth2Credential("twitch", "oauth:" + user.twitchTokens().getAccessToken()))
-                    .build();
+        updateClient(true);
         User twitchUser = client.getHelix().getUsers(user.twitchTokens().getAccessToken(), null, null).execute().getUsers().get(0);
         this.login = twitchUser.getLogin();
-        this.client.getChat().joinChannel(this.login);
         this.id = user.getTwitchId();
         for (Module module : this.user.getModules()) {
             if (module.getModuleType().getModuleClass() == null)
                 continue;
             this.modules.add((BaseModule) module.getModuleType().getModuleClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
         }
-        for (BaseModule module : this.modules)
-            module.register(client);
+        start();
         updateTokens();
         Logger.log(LogType.DEBUG, "[" + user.getId() + "] Started BotInstance(" + twitchUser.getLogin() + ", " + user.getTwitchId() + ") in " + (System.currentTimeMillis() - start) + "ms.", twitchUser.getLogin(), user.getTwitchId(), (System.currentTimeMillis() - start) + "ms");
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 if (nextCheck <= System.currentTimeMillis())
-                    updateTokens();
+                    try {
+                        updateTokens();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
             }
         }, 0, 1000);
     }
@@ -113,12 +107,9 @@ public class BotInstance {
             TokenPair spotifyTokens = user.spotifyTokens();
             user.getTokenPairs().remove(spotifyTokens);
             context.getBean(UserRepository.class).saveAndFlush(user);
-            context.getBean(TokenPairRepository.class).delete(spotifyTokens);
-            Logger.log(LogType.INFO, "[" + user.getId() + "] " + login + " revoked his access token so it was removed from the database.", login, "revoked", "database");
-            for (BaseModule module : this.modules)
-                module.unregister(client);
-            client.getChat().leaveChannel(this.login);
             context.getBean(BotInstanceManagementService.class).stopInstance(user);
+            dispose();
+            Logger.log(LogType.INFO, "[" + user.getId() + "] " + login + " revoked his access token so it was removed from the database.", login, "revoked", "database");
             return;
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
@@ -133,16 +124,57 @@ public class BotInstance {
         Optional<OAuth2Credential> credentialOptional = context.getBean(OAuth2IdentityProvider.class).refreshCredential(credential);
         if (credentialOptional.isPresent()) {
             credential = credentialOptional.get();
+            tokenPair.setAccessToken(credential.getAccessToken());
+            tokenPair.setRefreshToken(credential.getRefreshToken());
+            if (client == null)
+                return;
             User twitchUser = client.getHelix().getUsers(credential.getAccessToken(), null, null).execute().getUsers().get(0);
             if (tokenPair.getTokenType().equals(TokenType.TWITCH)) {
                 id = twitchUser.getId();
                 login = twitchUser.getLogin();
             }
-            tokenPair.setAccessToken(credential.getAccessToken());
-            tokenPair.setRefreshToken(credential.getRefreshToken());
             Logger.log(LogType.DEBUG, "[" + user.getId() + "] Got new Twitch Token(" + tokenPair.getTokenType().name() + ") for " + twitchUser.getLogin() + " | " + credential.getAccessToken(), "Twitch", tokenPair.getTokenType().name(), login, credential.getAccessToken());
         }
     }
 
+    public void updateClient() {
+        updateClient(false);
+    }
+
+    private void updateClient(boolean init) {
+        if (!init) {
+            user = context.getBean(UserRepository.class).getById(user.getId());
+            dispose();
+        }
+        if (user.chatAccountTokens() == null)
+            this.client = context.getBean(TwitchClient.class);
+        else {
+            updateTwitchToken(user.chatAccountTokens());
+            this.client = TwitchClientBuilder.builder()
+                    .withEnableHelix(true)
+                    .withEnablePubSub(true)
+                    .withEnableChat(true)
+                    .withCredentialManager(context.getBean(BotConfiguration.class).getAccountCredentialManager())
+                    .withDefaultAuthToken(new OAuth2Credential("twitch", "oauth:" + user.chatAccountTokens().getAccessToken()))
+                    .withChatAccount(new OAuth2Credential("twitch", "oauth:" + user.chatAccountTokens().getAccessToken()))
+                    .build();
+        }
+        if (!init)
+            start();
+        TokenType tokenType = user.chatAccountTokens() == null ? TokenType.TWITCH : TokenType.CHATACCOUNT;
+        Logger.log(LogType.INFO, "[" + user.getId() + "] Update on chat account. New TokenType: " + tokenType.name(), "Update", tokenType.name());
+    }
+
+    public void start() {
+        this.client.getChat().joinChannel(this.login);
+        for (BaseModule module : this.modules)
+            module.register(client);
+    }
+
+    public void dispose() {
+        for (BaseModule module : this.modules)
+            module.unregister(client);
+        client.getChat().leaveChannel(this.login);
+    }
 
 }

@@ -63,8 +63,17 @@ public class CallbackController {
     }
 
     @GetMapping("/spotify/unlink")
-    public String spotifyUnlink(Model model) {
-        return "index";
+    public String spotifyUnlink(@CookieValue(name = "session", defaultValue = "null") String session) {
+        BotUser user = sessionManagementService.getUser(session);
+        if (session.equals("null") || user == null)
+            return "redirect:/login";
+        TokenPair tokenPair = user.spotifyTokens();
+        if (tokenPair == null)
+            return "redirect:/dashboard";
+        user.getTokenPairs().remove(tokenPair);
+        repository.saveAndFlush(user);
+        botInstanceManagementService.stopInstance(user);
+        return "redirect:/dashboard";
     }
 
     @GetMapping("/twitch/callback")
