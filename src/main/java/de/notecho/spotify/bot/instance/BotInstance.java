@@ -50,9 +50,9 @@ public class BotInstance {
     private long nextCheck = System.currentTimeMillis();
 
     @SneakyThrows
-    public BotInstance(BotUser user, Environment environment) {
+    public BotInstance(BotUser user, Environment environment, ApplicationContext context) {
         long start = System.currentTimeMillis();
-        this.context = SpotifyBotApplication.getInstance();
+        this.context = context;
         this.user = user;
         this.spotifyApi = new SpotifyApi.Builder()
                 .setClientId(environment.getProperty("spotify.clientId"))
