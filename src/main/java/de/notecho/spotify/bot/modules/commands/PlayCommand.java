@@ -50,7 +50,7 @@ public class PlayCommand extends Command {
             }
             getRoot().getSpotifyApi().addItemToUsersPlaybackQueue(uri).build().execute();
             getRoot().getSpotifyApi().skipUsersPlaybackToNextTrack().build().execute();
-            sendMessage(sPlay, "$USER", userName, "$SONG", track.getName());
+            sendMessage(sPlay, "$USER", userName, "$SONG", track.getName(), "$ARTISTS", SpotifyUtils.getArtists(track));
             return;
         }
         getRoot().getSpotifyApi().startResumeUsersPlayback().build().execute();
