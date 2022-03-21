@@ -5,7 +5,6 @@ import com.github.philippheuer.credentialmanager.identityprovider.OAuth2Identity
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.helix.domain.User;
-import de.notecho.spotify.SpotifyBotApplication;
 import de.notecho.spotify.bot.BotInstanceManagementService;
 import de.notecho.spotify.bot.modules.BaseModule;
 import de.notecho.spotify.config.BotConfiguration;
@@ -106,7 +105,7 @@ public class BotInstance {
         } catch (BadRequestException e) {
             TokenPair spotifyTokens = user.spotifyTokens();
             user.getTokenPairs().remove(spotifyTokens);
-            context.getBean(UserRepository.class).saveAndFlush(user);
+            saveUser();
             context.getBean(BotInstanceManagementService.class).stopInstance(user);
             dispose();
             Logger.log(LogType.INFO, "[" + user.getId() + "] " + login + " revoked his access token so it was removed from the database.", login, "revoked", "database");
@@ -114,7 +113,7 @@ public class BotInstance {
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
-        context.getBean(UserRepository.class).saveAndFlush(user);
+        saveUser();
         nextCheck = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(50);
     }
 
@@ -175,6 +174,10 @@ public class BotInstance {
         for (BaseModule module : this.modules)
             module.unregister(client);
         client.getChat().leaveChannel(this.login);
+    }
+
+    public void saveUser() {
+        context.getBean(UserRepository.class).saveAndFlush(user);
     }
 
 }

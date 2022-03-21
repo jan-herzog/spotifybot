@@ -30,7 +30,7 @@ public abstract class Reward extends BaseModule {
             String message = event.getRedemption().getUserInput();
             if (!channelId.equals(getRoot().getId()))
                 return;
-            if (!event.getRedemption().getReward().getTitle().equalsIgnoreCase(getModule().getEntry(getModule().getModuleType().getTrigger()).getEntryValue()))
+            if (!event.getRedemption().getReward().getId().equalsIgnoreCase(getModule().getEntry(getModule().getModuleType().getTrigger()).getEntryValue()))
                 return;
             ChannelPointsUser user = event.getRedemption().getUser();
             try {
