@@ -16,7 +16,7 @@ public enum ModuleType {
     PLAY("splay", PlayCommand.class),
     PLAYADD("splayadd", PlayAddCommand.class),
     SKIP("sskip", SkipCommand.class),
-    PREVIOUS("sprevious", null),
+    PREVIOUS("sprevious", PreviousCommand.class),
     SONGREQUEST("srRedeem", SongrequestReward.class),
     SYSTEM(null, null);
 
