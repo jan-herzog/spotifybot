@@ -61,4 +61,8 @@ public class BotInstanceManagementService {
         getInstance(user).updateClient();
     }
 
+    public void updateModules(BotUser user) {
+        getInstance(user).updateModules(user);
+    }
+
 }

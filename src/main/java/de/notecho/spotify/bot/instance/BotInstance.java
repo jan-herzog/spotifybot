@@ -180,4 +180,16 @@ public class BotInstance {
         context.getBean(UserRepository.class).saveAndFlush(user);
     }
 
+    @SneakyThrows
+    public void updateModules(BotUser user) {
+        this.user = user ;
+        dispose();
+        this.modules.clear();
+        for (Module module : this.user.getModules()) {
+            if (module.getModuleType().getModuleClass() == null)
+                continue;
+            this.modules.add((BaseModule) module.getModuleType().getModuleClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
+        }
+    }
+
 }
