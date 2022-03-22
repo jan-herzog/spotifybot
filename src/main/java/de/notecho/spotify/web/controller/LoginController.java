@@ -23,7 +23,7 @@ public class LoginController {
     private final BotConfiguration configuration;
 
     @GetMapping("/login")
-    public String login(@CookieValue(name = "session", defaultValue = "null") String session, @RequestParam("force_verify") boolean forceVerify, Model model) {
+    public String login(@CookieValue(name = "session", defaultValue = "null") String session, @RequestParam(value = "force_verify", defaultValue = "false") boolean forceVerify, Model model) {
         BotUser user = sessionManagementService.getUser(session);
         if (session.equals("null") || user == null)
             return "redirect:" + configuration.getTwitchLink() + (forceVerify ? "&force_verify=true" : "");
