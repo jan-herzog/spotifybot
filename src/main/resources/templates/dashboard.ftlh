@@ -31,7 +31,7 @@
 </nav>
 <div class="container" style="padding-top: 200px;">
     <div class="row justify-content-md-center">
-        <div class="col-6"
+        <div class="col-8"
              style="padding: 50px;background-image: linear-gradient(to bottom right, #2d2d2d, #151515);border-radius: 20px;">
             <div class="row justify-content-md-center">
                 <div class="col">
@@ -61,7 +61,7 @@
     </div>
 
     <div class="row justify-content-md-center" style="margin-top: 50px;">
-        <div class="col-6"
+        <div class="col-8"
              style="padding: 50px;background-image: linear-gradient(to bottom right, #2d2d2d, #151515);border-radius: 20px;">
             <div class="row justify-content-md-center">
                 <div class="col">
@@ -86,7 +86,7 @@
         </div>
     </div>
     <div class="row justify-content-md-center" style="margin-top: 50px;">
-        <div class="col-6"
+        <div class="col-8"
              style="padding: 50px;background-image: linear-gradient(to bottom right, #2d2d2d, #151515);border-radius: 20px;">
             <div class="row justify-content-md-center">
                 <div class="col">
