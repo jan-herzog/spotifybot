@@ -67,7 +67,8 @@ public class BotInstance {
         for (Module module : this.user.getModules()) {
             if (module.getModuleType().getModuleClass() == null)
                 continue;
-            this.modules.add((BaseModule) module.getModuleType().getModuleClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
+            if (module.isEnabled())
+                this.modules.add((BaseModule) module.getModuleType().getModuleClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
         }
         start();
         updateTokens();
@@ -182,13 +183,14 @@ public class BotInstance {
 
     @SneakyThrows
     public void updateModules(BotUser user) {
-        this.user = user ;
+        this.user = user;
         dispose();
         this.modules.clear();
         for (Module module : this.user.getModules()) {
             if (module.getModuleType().getModuleClass() == null)
                 continue;
-            this.modules.add((BaseModule) module.getModuleType().getModuleClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
+            if (module.isEnabled())
+                this.modules.add((BaseModule) module.getModuleType().getModuleClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
         }
     }
 
