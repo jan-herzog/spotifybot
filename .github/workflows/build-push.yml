@@ -47,15 +47,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PASSWORD }}
-      - name: Build image
-        uses: docker/build-push-action@v2
-        with:
-          tags: ${{ steps.docker_meta.outputs.tags }} 
-          file: ./Dockerfile
-      - name: Push image
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          images: jan-herzog/spotifybot
-          tags: $([[ $CURRENT_BRANCH == "master" ]] && echo "latest" || echo $CURRENT_BRANCH)
-          file: ./Dockerfile
+      - name: Build and Push Docker Images
+        run: |
+          export CURRENT_BRANCH=${GITHUB_REF#refs/heads/}
+          export TAG=$([[ $CURRENT_BRANCH == "master" ]] && echo "latest" || echo $CURRENT_BRANCH)
+          export GITHUB_BRANCH_IMAGE=ghcr.io/jan-herzog/spitch-docker:$TAG
+          docker build -t $GITHUB_BRANCH_IMAGE .
+          docker push $GITHUB_BRANCH_IMAGE
+
