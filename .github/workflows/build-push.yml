@@ -1,0 +1,57 @@
+name: Build & Publish
+
+on:
+  push:
+    branches:
+      - "master"
+      - "development"
+  workflow_dispatch:
+
+jobs:
+  gradle-build:
+    runs-on: ubuntu-latest
+    container: openjdk:17-alpine          # Use gradle LTS container version, same as Dockerfile base image
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle
+          restore-keys: |
+              ${{ runner.os }}-gradle
+      - name: Checkout
+        uses: actions/checkout@v2
+      - run: chmod +x ./gradlew
+      - run: ./gradlew build
+      - name: Upload Gradle build          # Upload the artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: |
+            ./build/libs/
+          retention-days: 1        # artifact retention duration, can be upto 30 days
+  docker-push:
+    needs: gradle-build        # Job depends on next-build(above) job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download gradle build       # Download the above uploaded artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_PASSWORD }}
+      - name: Build and Push Docker Images
+        run: |
+          export CURRENT_BRANCH=${GITHUB_REF#refs/heads/}
+          export TAG=$([[ $CURRENT_BRANCH == "master" ]] && echo "latest" || echo $CURRENT_BRANCH)
+          export GITHUB_BRANCH_IMAGE=ghcr.io/jan-herzog/spitch-docker:$TAG
+          docker build -t $GITHUB_BRANCH_IMAGE .
+          docker push $GITHUB_BRANCH_IMAGE
+
