@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - "master"
-      - "development"
+      - "beta"
   workflow_dispatch:
 
 jobs:
