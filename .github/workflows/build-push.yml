@@ -54,7 +54,7 @@ jobs:
           password: ${{ secrets.GHCR_PASSWORD }}
       - name: Build and Push Docker Images
         run: |
-          export CURRENT_BRANCH=${GITHUB_REF#refs/heads/}
+          export CURRENT_BRANCH=${GITHUB_REF#refs/heads/#/refs/tags}
           export TAG=$([[ $CURRENT_BRANCH == "master" ]] && echo "latest" || echo $CURRENT_BRANCH)
           export GITHUB_BRANCH_IMAGE=ghcr.io/jan-herzog/spitch-docker:$TAG
           docker build -t $GITHUB_BRANCH_IMAGE .
