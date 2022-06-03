@@ -49,4 +49,11 @@ public class BotUser {
         this.tokenPairs.add(tokenPair);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BotUser botUser = (BotUser) o;
+        return id == botUser.id;
+    }
 }

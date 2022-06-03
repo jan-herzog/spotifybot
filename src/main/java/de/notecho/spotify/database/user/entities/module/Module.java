@@ -24,6 +24,8 @@ public class Module {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ModuleEntry> entries;
 
+    private boolean enabled;
+
     @Enumerated(EnumType.STRING)
     private ModuleType moduleType;
 
@@ -31,4 +33,15 @@ public class Module {
         return entries.stream().filter(entry -> entry.getEntryKey().equals(key)).findAny().orElse(null);
     }
 
+    public void enable() {
+        this.enabled = true;
+    }
+
+    public void disable() {
+        this.enabled = false;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
 }

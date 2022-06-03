@@ -94,7 +94,7 @@ public enum DefaultModules {
         final List<ModuleEntry> entries = new ArrayList<>();
         for (DefaultEntry entry : this.entries)
             entries.add(new ModuleEntry(0L, entry.getKey(), entry.getValue(), entry.getUserLevel()));
-        return new Module(0L, entries, this.commandType);
+        return new Module(0L, entries, true, this.commandType);
     }
 
     public static List<Module> defaultList() {

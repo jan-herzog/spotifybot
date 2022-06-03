@@ -1,54 +1,68 @@
 package de.notecho.spotify.bot;
 
+import de.notecho.spotify.SpotifyBotApplication;
 import de.notecho.spotify.bot.instance.BotInstance;
 import de.notecho.spotify.database.user.entities.BotUser;
 import de.notecho.spotify.database.user.repository.UserRepository;
 import de.notecho.spotify.utils.logger.LogType;
 import de.notecho.spotify.utils.logger.Logger;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BotInstanceManagementService {
 
     private final Environment environment;
 
+    private final UserRepository userRepository;
+
     @Getter
     private final List<BotInstance> activeInstances = new ArrayList<>();
 
-    @Autowired
-    public BotInstanceManagementService(Environment environment, UserRepository userRepository) {
-        this.environment = environment;
-        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        Logger.log(LogType.DEBUG, "Fetching users in 15 seconds...", "users", "15");
-        service.schedule(() -> {
-            Logger.log(LogType.DEBUG, "Fetching users...", "users");
-            for (BotUser user : userRepository.findAllByOrderByIdAsc())
-                startInstance(user);
-            Logger.log(LogType.DEBUG, "Fetched users!", "users");
-        }, 15, TimeUnit.SECONDS);
+    @EventListener(ApplicationReadyEvent.class)
+    public void fetchUsers(ApplicationReadyEvent event) {
+        Logger.log(LogType.DEBUG, "Fetching users...", "users");
+        for (BotUser user : userRepository.findAllByOrderByIdAsc())
+            startInstance(user, event.getApplicationContext());
+        Logger.log(LogType.DEBUG, "Fetched users!", "users");
+    }
+
+    public void startInstance(BotUser user, ApplicationContext context) {
+        if (user.spotifyTokens() == null) //TODO: OR INVALID
+            return;
+        activeInstances.add(new BotInstance(user, environment, context));
     }
 
     public void startInstance(BotUser user) {
-        if (user.spotifyTokens() == null) //TODO: OR INVALID
-            return;
-        activeInstances.add(new BotInstance(user, environment));
+        startInstance(user, SpotifyBotApplication.getInstance());
     }
 
     public void stopInstance(BotUser user) {
-        activeInstances.removeIf(botInstance -> botInstance.getUser().equals(user));
+        BotInstance instance = getInstance(user);
+        instance.dispose();
+        activeInstances.remove(instance);
     }
 
     public BotInstance getInstance(BotUser user) {
         return activeInstances.stream().filter(botInstance -> botInstance.getUser().equals(user)).findAny().orElse(null);
+    }
+
+    public void updateClient(BotUser user) {
+        getInstance(user).updateClient();
+    }
+
+    public void updateModules(BotUser user) {
+        getInstance(user).updateModules(user);
     }
 
 }

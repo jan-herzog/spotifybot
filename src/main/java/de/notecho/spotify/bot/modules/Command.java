@@ -1,12 +1,10 @@
 package de.notecho.spotify.bot.modules;
 
-import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.domain.IEventSubscription;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
-import com.github.twitch4j.pubsub.PubSubSubscription;
 import de.notecho.spotify.bot.instance.BotInstance;
 import de.notecho.spotify.database.user.entities.module.Module;
 import de.notecho.spotify.module.ModuleType;
@@ -47,7 +45,7 @@ public abstract class Command extends BaseModule {
                     } catch (NullPointerException e) {
                         sendMessage(getModule(ModuleType.SYSTEM).getEntry("spotifyNotReachable"), "$USER", user.getName());
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        System.out.println(e.getMessage());
                     }
             }
         };

@@ -9,8 +9,6 @@ import de.notecho.spotify.module.ModuleType;
 import de.notecho.spotify.module.UserLevel;
 import de.notecho.spotify.utils.SpotifyUtils;
 import lombok.SneakyThrows;
-import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 
 import java.util.Arrays;
@@ -36,21 +34,19 @@ public class PlayCommand extends Command {
                     searchQuery.append(" ");
                 else
                     searchQuery.append(args[i]);
-            Paging<Track> search = getRoot().getSpotifyApi().searchTracks(searchQuery.toString()).build().execute();
-            if (search.getTotal() == 0) {
-                sendMessage(getModule(ModuleType.SONGREQUEST).getEntry("notFound"), "$USER", userName);
+            Track track = SpotifyUtils.getTrackFromString(searchQuery.toString(), getRoot().getSpotifyApi());
+            if (track == null) {
+                sendMessage(getModule().getEntry("notFound"), "$USER", userName);
                 return;
             }
-            String uri = search.getItems()[0].getUri();
             CountryCode country = getRoot().getSpotifyApi().getCurrentUsersProfile().build().execute().getCountry();
-            Track track = getRoot().getSpotifyApi().getTrack(uri.replace("spotify:track:", "")).build().execute();
-            if (Arrays.stream(track.getAvailableMarkets()).noneMatch(countryCode -> countryCode.equals(CountryCode.DE))) {
+            if (Arrays.stream(track.getAvailableMarkets()).noneMatch(countryCode -> countryCode.equals(country != null ? country : CountryCode.US))) {
                 sendMessage(getModule(ModuleType.SONGREQUEST).getEntry("notAvailable"), "$USER", userName, "$SONG", track.getName());
                 return;
             }
-            getRoot().getSpotifyApi().addItemToUsersPlaybackQueue(uri).build().execute();
+            getRoot().getSpotifyApi().addItemToUsersPlaybackQueue(track.getUri()).build().execute();
             getRoot().getSpotifyApi().skipUsersPlaybackToNextTrack().build().execute();
-            sendMessage(sPlay, "$USER", userName, "$SONG", track.getName());
+            sendMessage(sPlay, "$USER", userName, "$SONG", track.getName(), "$ARTISTS", SpotifyUtils.getArtists(track));
             return;
         }
         getRoot().getSpotifyApi().startResumeUsersPlayback().build().execute();
