@@ -5,14 +5,10 @@ on:
     branches:
       - "master"
       - "beta"
-  release:
-    types:
-      - published
   workflow_dispatch:
 
 jobs:
   gradle-build:
-    if: "!contains(github.event.head_commit.message, 'skip ci')"
     runs-on: ubuntu-latest
     container: openjdk:17-alpine          # Use gradle LTS container version, same as Dockerfile base image
     steps:
@@ -36,7 +32,6 @@ jobs:
             ./build/libs/
           retention-days: 1        # artifact retention duration, can be upto 30 days
   docker-push:
-    if: "!contains(github.event.head_commit.message, 'skip ci')"
     needs: gradle-build        # Job depends on next-build(above) job
     runs-on: ubuntu-latest
     steps:
@@ -55,7 +50,6 @@ jobs:
       - name: Build and Push Docker Images
         run: |
           export CURRENT_BRANCH=${GITHUB_REF#refs/heads/}
-          export CURRENT_BRANCH=${CURRENT_BRANCH#refs/tags/}
           export TAG=$([[ $CURRENT_BRANCH == "master" ]] && echo "latest" || echo $CURRENT_BRANCH)
           export GITHUB_BRANCH_IMAGE=ghcr.io/jan-herzog/spitch-docker:$TAG
           docker build -t $GITHUB_BRANCH_IMAGE .
