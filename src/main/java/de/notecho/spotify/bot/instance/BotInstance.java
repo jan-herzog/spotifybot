@@ -61,6 +61,7 @@ public class BotInstance {
                 .setRedirectUri(SpotifyHttpManager.makeUri(environment.getProperty("spotify.uri")))
                 .build();
         updateClient(true);
+        updateTokens();
         User twitchUser = client.getHelix().getUsers(user.twitchTokens().getAccessToken(), null, null).execute().getUsers().get(0);
         this.login = twitchUser.getLogin();
         this.id = user.getTwitchId();
@@ -71,7 +72,6 @@ public class BotInstance {
                 this.modules.add((BaseModule) module.getModuleType().getModuleClass().getConstructor(Module.class, BotInstance.class).newInstance(module, this));
         }
         start();
-        updateTokens();
         Logger.log(LogType.DEBUG, "[" + user.getId() + "] Started BotInstance(" + twitchUser.getLogin() + ", " + user.getTwitchId() + ") in " + (System.currentTimeMillis() - start) + "ms.", twitchUser.getLogin(), user.getTwitchId(), (System.currentTimeMillis() - start) + "ms");
         new Timer().schedule(new TimerTask() {
             @Override
@@ -89,7 +89,7 @@ public class BotInstance {
 
     private void updateTokens() {
         if (user.spotifyTokens() == null) {
-            context.getBean(BotInstanceManagementService.class).stopInstance(user);
+            dispose();
             return;
         }
         updateTwitchToken(user.twitchTokens());
@@ -175,6 +175,7 @@ public class BotInstance {
         for (BaseModule module : this.modules)
             module.unregister(client);
         client.getChat().leaveChannel(this.login);
+        context.getBean(BotInstanceManagementService.class).getActiveInstances().remove(this);
     }
 
     public void saveUser() {
