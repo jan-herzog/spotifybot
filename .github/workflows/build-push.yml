@@ -12,6 +12,7 @@ on:
 
 jobs:
   gradle-build:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
     runs-on: ubuntu-latest
     container: openjdk:17-alpine          # Use gradle LTS container version, same as Dockerfile base image
     steps:
@@ -35,6 +36,7 @@ jobs:
             ./build/libs/
           retention-days: 1        # artifact retention duration, can be upto 30 days
   docker-push:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
     needs: gradle-build        # Job depends on next-build(above) job
     runs-on: ubuntu-latest
     steps:
@@ -50,15 +52,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_PASSWORD }}
-      - name: Extract tag name
-        id: tag
-        uses: actions/github-script@0.2.0
-        with:
-          github-token: ${{ secrets.GHCR_PASSWORD }}
-          script: |
-            return context.payload.ref.replace(/\/refs\/tags\//, '');
+      - name: Get Tag Name
+        id: tag_name
+        run: |
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
       - name: Echo Tag
-        run: echo ${{ steps.tag.outputs.result }}
+        run: echo ${{ steps.tag_name.outputs.SOURCE_TAG }}
       - name: Build and Push Docker Images
         run: |
           export CURRENT_BRANCH=${GITHUB_REF#refs/heads/}
@@ -66,4 +65,7 @@ jobs:
           export GITHUB_BRANCH_IMAGE=ghcr.io/jan-herzog/spitch-docker:$TAG
           docker build -t $GITHUB_BRANCH_IMAGE .
           docker push $GITHUB_BRANCH_IMAGE
+        shell: bash
+        env:
+          VERSION: ${{ steps.tag_name.outputs.SOURCE_TAG }}
 
