@@ -28,7 +28,7 @@ public class ModuleController {
         BotUser user = sessionManagementService.getUser(session);
         if (session.equals("null") || user == null)
             return ResponseEntity.badRequest().build();
-        Module module = user.getModules().stream().filter(m -> m.getModuleType().equals(ModuleType.valueOf(moduleType))).findAny().orElse(null);
+        Module module = user.getModules().stream().filter(m -> m.getModuleType().equals(ModuleType.valueOf(moduleType.toUpperCase()))).findAny().orElse(null);
         if (module == null)
             return ResponseEntity.badRequest().build();
         paramMap.forEach((k, v) -> {
