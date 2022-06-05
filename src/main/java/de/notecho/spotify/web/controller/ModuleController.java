@@ -24,7 +24,7 @@ public class ModuleController {
     private final UserRepository userRepository;
 
     @PostMapping(value = "/modules/{moduleType}/update", consumes = "application/x-www-form-urlencoded")
-    public ResponseEntity<String> updateModule(@PathVariable String moduleType, @CookieValue(name = "session", defaultValue = "null") String session, MultiValueMap<String, String> paramMap) {
+    public ResponseEntity<String> updateModule(@PathVariable String moduleType, @CookieValue(name = "session", defaultValue = "null") String session, @RequestBody MultiValueMap<String, String> paramMap) {
         BotUser user = sessionManagementService.getUser(session);
         if (session.equals("null") || user == null)
             return ResponseEntity.badRequest().build();
