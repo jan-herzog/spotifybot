@@ -79,11 +79,11 @@ public class CallbackController {
     @GetMapping("/twitch/callback")
     public String twitchCallback(@RequestParam(name = "code", defaultValue = "null") String code, HttpServletResponse response, Model model) {
         if (code.equals("null"))
-            return "redirect:/erorr?code=503";
+            return "redirect:/error?code=503";
         OAuth2Credential credentialByCode = oAuth2IdentityProvider.getCredentialByCode(code);
         List<User> users = twitchClient.getHelix().getUsers(credentialByCode.getAccessToken(), null, null).execute().getUsers();
         if (users.size() == 0)
-            return "redirect:/erorr?code=503";
+            return "redirect:/error?code=503";
         User twitchUser = users.get(0);
         BotUser user = repository.findByTwitchId(twitchUser.getId());
         if (user == null) {
