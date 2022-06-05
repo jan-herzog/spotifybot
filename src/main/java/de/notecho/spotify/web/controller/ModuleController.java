@@ -23,7 +23,7 @@ public class ModuleController {
 
     private final UserRepository userRepository;
 
-    @PostMapping(value = "/modules/{{moduleType}}/update", consumes = "application/x-www-form-urlencoded")
+    @PostMapping(value = "/modules/{moduleType}/update", consumes = "application/x-www-form-urlencoded")
     public ResponseEntity<String> updateModule(@PathVariable String moduleType, @CookieValue(name = "session", defaultValue = "null") String session, MultiValueMap<String, String> paramMap) {
         BotUser user = sessionManagementService.getUser(session);
         if (session.equals("null") || user == null)
@@ -42,7 +42,7 @@ public class ModuleController {
         return ResponseEntity.ok("Success: " + user.getId());
     }
 
-    @GetMapping(value = "/modules/{{moduleType}}/disable")
+    @GetMapping(value = "/modules/{moduleType}/disable")
     public ResponseEntity<String> disableModule(@PathVariable String moduleType, @CookieValue(name = "session", defaultValue = "null") String session) {
         BotUser user = sessionManagementService.getUser(session);
         if (session.equals("null") || user == null)
@@ -57,7 +57,7 @@ public class ModuleController {
     }
 
 
-    @GetMapping(value = "/modules/{{moduleType}}/enable")
+    @GetMapping(value = "/modules/{moduleType}/enable")
     public ResponseEntity<String> enableModule(@PathVariable String moduleType, @CookieValue(name = "session", defaultValue = "null") String session) {
         BotUser user = sessionManagementService.getUser(session);
         if (session.equals("null") || user == null)
