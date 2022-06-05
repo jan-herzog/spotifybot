@@ -92,125 +92,20 @@
                 <div class="col">
                     <div>
                         <h2>Commands</h2>
-                        <p>There are quite a few commands spitch is providing. Here you can customize all the
-                            responses the bot gives. Therefore, you can change the language as you like.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="row" style="padding-bottom: 20px;">
-                <div class="col"><span class="h4">!song</span>
-                    <button class="btn btn-dark" type="button"
-                            style="margin: 10px;" data-bs-target="#song-modal" data-bs-toggle="modal">Edit
-                        Response
-                    </button>
-                    <div class="row">
-                        <div class="col text-start"><span>Shows information about the song that is currently
-                                    playing</span>
-                            <div class="modal fade" role="dialog" tabindex="-1" id="song-modal">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title">Edit Command Response - !song</h4>
-                                            <button
-                                                    type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body text-start">
-                                            <p class="text-start h5">Available placeholders:</p>
-                                            <div class="text-start"><span
-                                                        class="fw-bold text-start text-info">$USER </span><span>-
-                                                        user issuing the command</span></div>
-                                            <div class="text-start"><span
-                                                        class="fw-bold text-start text-info">$SONG </span><span>-
-                                                        song title of the current playing song</span></div>
-                                            <div class="text-start"><span
-                                                        class="fw-bold text-start text-info">$ARTISTS </span><span>-
-                                                        artists of the current playing song</span></div>
-                                            <form style="margin-top: 20px;" action="/modules/song/update" method="post"
-                                                  target="hidden">
-                                                <p class="h5">Command cases:</p>
-                                                <div>
-                                                    <p>If you don't want a response being sent for a specific
-                                                        command case, you can just remove the whole response and
-                                                        type '--'.</p>
-                                                </div>
-                                                <span>'playingSong' - command succeeds</span>
-                                                <input
-                                                        class="form-control md-input" type="text" name="playingSong"
-                                                        placeholder="Response if !song succeeds" style="color: white;"
-                                                        value="${playingSong}">
+                        <p>There are quite a few commands spitch is providing. Here is a short (and temporary) list of all commands.</p>
+                        <ul>
+                            <li>!song - Show information about the current playing song</li>
+                            <li>!lastsong - Show information about the last played song</li>
+                            <li>!svolume (+/-amount) - Shows/changes the current spotify playback volume</li>
+                            <li>!spause - Pauses playback</li>
+                            <li>!splay - Starts playback</li>
+                            <li>!splayadd (name of the song) - Adds song to playback</li>
+                            <li>!sskip - Skips current song</li>
+                            <li>!sprevious - Goes back to the last song</li>
+                        </ul>
 
-                                                <span>'notPlaying' - playback paused</span>
-                                                <input class="form-control md-input" type="text"
-                                                       name="notPlaying"
-                                                       placeholder="Response if !song fails due to no song playing"
-                                                       style="color: white;" value="${notPlaying}">
-
-                                                <div class="modal-footer" style="padding: 10px 0 0;">
-                                                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">
-                                                        Close
-                                                    </button>
-                                                    <button class="btn btn-primary" type="submit">Save</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row" style="padding-bottom: 20px;">
-                <div class="col"><span class="h4">!lastsong</span>
-                    <button class="btn btn-dark" type="button"
-                            style="margin: 10px;" data-bs-target="#lastsong-modal" data-bs-toggle="modal">Edit
-                        Response
-                    </button>
-                    <div class="row">
-                        <div class="col text-start"><span>Shows information about the song that was last
-                                    played</span>
-                            <div class="modal fade" role="dialog" tabindex="-1" id="lastsong-modal">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title">Edit Command Response - !lastsong</h4>
-                                            <button
-                                                    type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body text-start">
-                                            <p class="text-start h5">Available placeholders:</p>
-                                            <div class="text-start"><span
-                                                        class="fw-bold text-start text-info">$USER </span><span>-
-                                                        user issuing the command</span></div>
-                                            <div class="text-start"><span
-                                                        class="fw-bold text-start text-info">$LASTSONG </span><span>-
-                                                        song title of the last played song</span></div>
-                                            <div class="text-start"><span
-                                                        class="fw-bold text-start text-info">$ARTISTS </span><span>-
-                                                        artists of the current playing song</span></div>
-                                            <form style="margin-top: 20px;" action="/modules/lastsong/update" method="post"
-                                                  target="hidden">
-                                                <p class="h5">Command cases:</p><span>'lastSong' - command
-                                                        succeeds</span><input class="form-control md-input" type="text"
-                                                                              name="playingSong"
-                                                                              placeholder="Response if !lastsong succeeds"
-                                                                              style="color: white;" value="${lastSong}">
-                                                <div class="modal-footer" style="padding: 10px 0 0;">
-                                                    <button class="btn btn-light" type="button"
-                                                            data-bs-dismiss="modal">Close
-                                                    </button>
-                                                    <button
-                                                            class="btn btn-primary" type="submit">Save
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <h2>Songrequest</h2>
+                        <p>You do get a custom chanel point reward created. You can change its properties but not the title. It works like !splayadd</p>
                     </div>
                 </div>
             </div>
