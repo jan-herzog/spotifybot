@@ -133,7 +133,7 @@ public class BotInstance {
                 id = twitchUser.getId();
                 login = twitchUser.getLogin();
             }
-            Logger.log(LogType.DEBUG, "[" + user.getId() + "] Got new Twitch Token(" + tokenPair.getTokenType().name() + ") for " + twitchUser.getLogin() + " | " + credential.getAccessToken(), "Twitch", tokenPair.getTokenType().name(), login, credential.getAccessToken());
+            Logger.log(LogType.DEBUG, "[" + user.getId() + "] Got new Twitch Token(" + tokenPair.getTokenType().name() + ") for " + twitchUser.getLogin() + " | " + credential.getAccessToken().substring(0, 20), "Twitch", tokenPair.getTokenType().name(), login, credential.getAccessToken());
         }
     }
 
