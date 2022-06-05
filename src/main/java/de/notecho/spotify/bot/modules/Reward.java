@@ -27,7 +27,7 @@ public abstract class Reward extends BaseModule {
         setEventConsumer(channelPointsRedemptionEvent());
         List<CustomReward> rewardList = root.getClient().getHelix().getCustomRewards(getRoot().getUser().twitchTokens().getAccessToken(), getRoot().getUser().getTwitchId(), null, true).execute().getRewards();
         ModuleEntry entry = module.getEntry(module.getModuleType().getTrigger());
-        if (rewardList.stream().noneMatch(customReward -> customReward.getId().equalsIgnoreCase(entry.getEntryValue()))) {
+        if (rewardList.stream().noneMatch(customReward -> customReward.getTitle().equalsIgnoreCase(entry.getEntryValue()))) {
             CustomReward reward = getRoot().getClient().getHelix().createCustomReward(
                     getRoot().getUser().twitchTokens().getAccessToken(),
                     getRoot().getUser().getTwitchId(),

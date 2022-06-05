@@ -50,7 +50,6 @@ public class BotInstanceManagementService {
     public void stopInstance(BotUser user) {
         BotInstance instance = getInstance(user);
         instance.dispose();
-        activeInstances.remove(instance);
     }
 
     public BotInstance getInstance(BotUser user) {

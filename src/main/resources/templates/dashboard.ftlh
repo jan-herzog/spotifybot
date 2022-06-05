@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
     <link rel="stylesheet" href="assets/css/styles.min.css">
 </head>
-<body style="background-image: linear-gradient(to bottom right, #eb01a5, #d13531);">
+<body style="background-image: linear-gradient(to bottom right, #eb01a5, #d13531);background-attachment: fixed;margin: 0;padding: 0;">
 <nav class="navbar navbar-dark navbar-expand-md" style="z-index: 2;position: absolute;width: 100%;padding: 20px;">
     <div class="container-fluid"><a class="navbar-brand" href="#">Spitchbot</a>
         <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span
@@ -126,7 +126,7 @@
                                             <div class="text-start"><span
                                                         class="fw-bold text-start text-info">$ARTISTS </span><span>-
                                                         artists of the current playing song</span></div>
-                                            <form style="margin-top: 20px;" action="/modules/song" method="post"
+                                            <form style="margin-top: 20px;" action="/modules/song/update" method="post"
                                                   target="hidden">
                                                 <p class="h5">Command cases:</p>
                                                 <div>
@@ -190,7 +190,7 @@
                                             <div class="text-start"><span
                                                         class="fw-bold text-start text-info">$ARTISTS </span><span>-
                                                         artists of the current playing song</span></div>
-                                            <form style="margin-top: 20px;" action="/modules/lastsong" method="post"
+                                            <form style="margin-top: 20px;" action="/modules/lastsong/update" method="post"
                                                   target="hidden">
                                                 <p class="h5">Command cases:</p><span>'lastSong' - command
                                                         succeeds</span><input class="form-control md-input" type="text"
@@ -218,11 +218,12 @@
     </div>
 </div>
 <iframe style="display:none" name="hidden"></iframe>
-<footer style="text-align: center;position: absolute;z-index: 2;bottom: 0;left: 50%;transform: translate(-50%);"><span
-            style="color: #cccccc;padding: 10;">Made with&nbsp;<i class="fa fa-heart"
-                                                                  style="color: red;transform: scale(0.70);"></i>&nbsp;by&nbsp;<a
-                href="https://twitch.tv/kexesser" style="text-decoration: none;color: inherit;"
-                target="_blank">Kexesser</a></span></footer>
+<footer
+        style="text-align: center;position: relative;z-index: 2;bottom: 0;left: 50%;transform: translate(-50%);margin-top: 10px;">
+        <span class="text-white" style="color: #cccccc;padding: 10px;">Made with&nbsp;<i class="fa fa-heart"
+                                                                                         style="color: red;transform: scale(0.70);"></i>&nbsp;by&nbsp;<a
+                    href="https://twitch.tv/kexesser"
+                    style="text-decoration: none;color: inherit;" target="_blank">Kexesser</a></span></footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/script.min.js"></script>
