@@ -37,6 +37,4 @@ public class SongrequestReward extends Reward {
         getRoot().getSpotifyApi().addItemToUsersPlaybackQueue(track.getUri()).build().execute();
         sendMessage(getModule().getEntry("requested"), "$USER", userName, "$SONG", track.getName());
     }
-
-
 }
