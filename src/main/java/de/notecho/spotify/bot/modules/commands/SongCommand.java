@@ -21,6 +21,7 @@ public class SongCommand extends Command {
     @SneakyThrows
     public void exec(String userName, String id, UserLevel userLevel, String[] args) {
         CurrentlyPlaying currentlyPlaying = getRoot().getSpotifyApi().getUsersCurrentlyPlayingTrack().build().execute();
+        System.out.println(getRoot().getSpotifyApi().getCurrentUsersProfile().build().execute().getDisplayName());
         if (!currentlyPlaying.getIs_playing()) {
             sendMessage(getModule().getEntry("notPlaying"), "$USER", userName);
             return;

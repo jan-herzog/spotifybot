@@ -53,6 +53,8 @@ public class BotInstance {
         long start = System.currentTimeMillis();
         this.context = context;
         this.user = user;
+        System.out.println(user.spotifyTokens().getId());
+        System.out.println(user.spotifyTokens().getAccessToken());
         this.spotifyApi = new SpotifyApi.Builder()
                 .setClientId(environment.getProperty("spotify.clientId"))
                 .setClientSecret(environment.getProperty("spotify.clientSecret"))
@@ -60,6 +62,7 @@ public class BotInstance {
                 .setRefreshToken(user.spotifyTokens().getRefreshToken())
                 .setRedirectUri(SpotifyHttpManager.makeUri(environment.getProperty("spotify.uri")))
                 .build();
+        System.out.println(this.spotifyApi.getCurrentUsersProfile().build().execute().getDisplayName());
         updateClient(true);
         updateTokens();
         User twitchUser = client.getHelix().getUsers(user.twitchTokens().getAccessToken(), null, null).execute().getUsers().get(0);
