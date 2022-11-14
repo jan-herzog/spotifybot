@@ -102,7 +102,7 @@ public class BotInstance {
             spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
             spotifyApi.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
             user.spotifyTokens().setAccessToken(authorizationCodeCredentials.getAccessToken());
-            Logger.log(LogType.DEBUG, "[" + user.getId() + "] Got new Spotify Token for " + login + ", expires in: " + authorizationCodeCredentials.getExpiresIn() + " | " + authorizationCodeCredentials.getAccessToken().substring(0, 10) + "...", "Spotify", login, String.valueOf(authorizationCodeCredentials.getExpiresIn()), authorizationCodeCredentials.getAccessToken().substring(0, 10) + "...");
+            Logger.log(LogType.DEBUG, "[" + user.getId() + "] Got new Spotify Token(" + user.spotifyTokens().getId() + ") for " + login + ", expires in: " + authorizationCodeCredentials.getExpiresIn() + " | " + authorizationCodeCredentials.getAccessToken().substring(0, 10) + "...", "Spotify", login, String.valueOf(authorizationCodeCredentials.getExpiresIn()), authorizationCodeCredentials.getAccessToken().substring(0, 10) + "...");
         } catch (BadRequestException e) {
             TokenPair spotifyTokens = user.spotifyTokens();
             user.getTokenPairs().remove(spotifyTokens);
