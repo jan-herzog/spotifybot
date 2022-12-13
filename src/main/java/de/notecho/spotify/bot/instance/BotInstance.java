@@ -62,7 +62,6 @@ public class BotInstance {
                 .setRefreshToken(user.spotifyTokens().getRefreshToken())
                 .setRedirectUri(SpotifyHttpManager.makeUri(environment.getProperty("spotify.uri")))
                 .build();
-        System.out.println(this.spotifyApi.getCurrentUsersProfile().build().execute().getDisplayName());
         updateClient(true);
         updateTokens();
         User twitchUser = client.getHelix().getUsers(user.twitchTokens().getAccessToken(), null, null).execute().getUsers().get(0);
