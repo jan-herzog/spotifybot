@@ -75,6 +75,7 @@ public class BotConfiguration {
     @Bean
     @DependsOn("buildCredentialManager")
     public TwitchClient buildTwitchClient(CredentialManager credentialManager) {
+        System.out.println(credentialManager.getIdentityProviders());
         credentialManager.registerIdentityProvider(new TwitchIdentityProvider(twitchClientId, twitchClientSecret, twitchUri));
         accountCredentialManager = CredentialManagerBuilder.builder().build();
         accountCredentialManager.registerIdentityProvider(new TwitchIdentityProvider(twitchAccountClientId, twitchAccountClientSecret, twitchAccountUri));
